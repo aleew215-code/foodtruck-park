@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { auth } from '@/lib/auth'
 import { Navbar } from '@/components/layout/navbar'
 import { InstallBanner } from '@/components/pwa/InstallBanner'
+import { CartSync } from '@/components/CartSync'
 
 export default async function CustomerLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
@@ -11,6 +12,7 @@ export default async function CustomerLayout({ children }: { children: React.Rea
   if (role === 'SUPER_ADMIN') redirect('/admin')
   return (
     <div className="min-h-screen bg-gray-50">
+      <CartSync />
       <Navbar />
       <main className="mx-auto max-w-7xl px-4 py-6 pb-32">{children}</main>
       <InstallBanner />

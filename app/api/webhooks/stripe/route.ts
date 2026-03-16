@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session
+    if (session.payment_status !== 'paid') return NextResponse.json({ received: true })
 
     // Wallet top-up
     if (session.metadata?.type === 'wallet_topup' && session.metadata?.userId) {
@@ -34,18 +35,21 @@ export async function POST(req: NextRequest) {
           where: { id: userId },
           data: { walletBalance: { increment: amount } },
         })
-
         await prisma.walletTransaction.create({
-          data: {
-            userId,
-            amount,
-            type: 'credit',
-            description: `Wallet top-up via Stripe`,
-          },
+          data: { userId, amount, type: 'credit', description: `Wallet top-up via Stripe` },
         })
-
         console.log(`Wallet top-up: +$${amount} for user ${userId}`)
       }
+    }
+
+    // Order payment
+    if (session.metadata?.type === 'order_payment' && session.metadata?.orderIds) {
+      const orderIds = session.metadata.orderIds.split(',').filter(Boolean)
+      await prisma.order.updateMany({
+        where: { id: { in: orderIds }, paymentStatus: 'PENDING' },
+        data: { paymentStatus: 'COMPLETED', status: 'CONFIRMED', stripePaymentId: session.id },
+      })
+      console.log(`Orders confirmed via webhook: ${orderIds.join(', ')}`)
     }
   }
 

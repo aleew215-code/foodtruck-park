@@ -18,12 +18,14 @@ export interface CartItem {
 interface CartStore {
   items: CartItem[]
   tableNumber: number | null
+  cartUserId: string | null
   addItem: (item: CartItem) => void
   removeItem: (id: string, foodTruckId: string) => void
   updateQuantity: (id: string, foodTruckId: string, quantity: number) => void
   clearCart: () => void
   clearTruckItems: (foodTruckId: string) => void
   setTableNumber: (n: number | null) => void
+  setCartUserId: (id: string | null) => void
   itemCount: number
   total: number
 }
@@ -33,9 +35,11 @@ export const useCart = create<CartStore>()(
     (set, get) => ({
       items: [],
       tableNumber: null,
+      cartUserId: null,
       itemCount: 0,
       total: 0,
       setTableNumber: (n) => set({ tableNumber: n }),
+      setCartUserId: (id) => set({ cartUserId: id }),
       addItem: (item) => {
         const items = get().items
         const existing = items.find((i) => i.id === item.id && i.foodTruckId === item.foodTruckId)
