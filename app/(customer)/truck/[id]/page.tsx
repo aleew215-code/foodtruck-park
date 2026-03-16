@@ -71,7 +71,6 @@ export default function TruckMenuPage() {
 
   function handleAdd(item: MenuItem) {
     addItem({ id: item.id, foodTruckId: id as string, foodTruckName: truck!.name, menuItemId: item.id, name: item.name, price: item.price, quantity: 1, image: item.image || undefined })
-    toast(`${item.name} added to cart`)
   }
 
   function handleRemove(item: MenuItem) {
@@ -219,7 +218,7 @@ export default function TruckMenuPage() {
                 </div>
                 <span className="font-semibold text-gray-900">{formatCurrency(combo.price)}</span>
               </div>
-              <button onClick={() => { addItem({ id: combo.id, foodTruckId: id as string, foodTruckName: truck.name, comboId: combo.id, name: combo.name, price: combo.price, quantity: 1 }); toast(`${combo.name} added!`) }} disabled={!truck.isOpen} className="mt-3 flex items-center gap-1.5 bg-orange-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-orange-600 transition disabled:opacity-50">
+              <button onClick={() => { addItem({ id: combo.id, foodTruckId: id as string, foodTruckName: truck.name, comboId: combo.id, name: combo.name, price: combo.price, quantity: 1 }); }} disabled={!truck.isOpen} className="mt-3 flex items-center gap-1.5 bg-orange-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-orange-600 transition disabled:opacity-50">
                 <Plus className="h-4 w-4" /> Add Combo
               </button>
             </div>
