@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Plus, Power, Loader2, Truck } from 'lucide-react'
+import { Plus, Power, Loader2, Truck, QrCode, Download, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -10,6 +10,7 @@ import { Switch } from '@/components/ui/switch'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
 import { format } from 'date-fns'
+import QRCode from 'qrcode'
 
 export default function AdminFoodTrucksPage() {
   const { toast } = useToast()
@@ -18,12 +19,32 @@ export default function AdminFoodTrucksPage() {
   const [showModal, setShowModal] = useState(false)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({ name: '', email: '', cuisine: '', phone: '' })
+  const [qrTruck, setQrTruck] = useState<any>(null)
+  const [qrDataUrl, setQrDataUrl] = useState('')
 
   useEffect(() => {
     fetch('/api/admin/food-trucks')
       .then(r => r.json())
       .then(d => { setTrucks(d); setLoading(false) })
   }, [])
+
+  async function showQR(truck: any) {
+    const url = `${window.location.origin}/truck/${truck.id}`
+    const dataUrl = await QRCode.toDataURL(url, {
+      width: 400,
+      margin: 2,
+      color: { dark: '#1f2937', light: '#ffffff' },
+    })
+    setQrTruck(truck)
+    setQrDataUrl(dataUrl)
+  }
+
+  function downloadQR(truckName: string) {
+    const a = document.createElement('a')
+    a.href = qrDataUrl
+    a.download = `qr-${truckName.replace(/\s+/g, '-').toLowerCase()}.png`
+    a.click()
+  }
 
   async function createTruck() {
     setSaving(true)
@@ -68,6 +89,9 @@ export default function AdminFoodTrucksPage() {
               </div>
               <div className="flex items-center gap-3">
                 <Badge variant={truck.isOpen ? 'success' : 'secondary'}>{truck.isOpen ? 'Open' : 'Closed'}</Badge>
+                <Button variant="outline" size="sm" onClick={() => showQR(truck)} className="flex items-center gap-1.5">
+                  <QrCode className="h-4 w-4" /> QR Code
+                </Button>
                 <div className="flex items-center gap-2 text-sm">
                   <span className="text-gray-500">Active</span>
                   <Switch checked={truck.isActive} onCheckedChange={() => toggleActive(truck.id, truck.isActive)} />
@@ -79,6 +103,34 @@ export default function AdminFoodTrucksPage() {
         </div>
       </div>
 
+      {/* QR Code Modal */}
+      {qrTruck && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-gray-900 text-lg">{qrTruck.name}</h3>
+              <button onClick={() => setQrTruck(null)} className="text-gray-400 hover:text-gray-600">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            {qrDataUrl && (
+              <img src={qrDataUrl} alt="QR Code" className="mx-auto rounded-xl border border-gray-100 mb-4" width={240} height={240} />
+            )}
+            <p className="text-xs text-gray-500 mb-1">Customers scan this to order from</p>
+            <p className="text-sm font-semibold text-gray-800 mb-5">{qrTruck.name}</p>
+            <div className="space-y-2">
+              <Button className="w-full" onClick={() => downloadQR(qrTruck.name)}>
+                <Download className="h-4 w-4 mr-2" /> Download QR Code
+              </Button>
+              <Button variant="outline" className="w-full" onClick={() => setQrTruck(null)}>
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create Truck Modal */}
       <Modal open={showModal} onClose={() => setShowModal(false)} title="Add New Food Truck">
         <div className="p-6 space-y-4">
           <div><Label>Truck Name</Label><Input value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Taco Express" className="mt-1" /></div>
