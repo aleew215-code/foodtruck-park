@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     ui_mode: 'embedded',
     line_items: lineItems,
     return_url: returnUrl,
-    automatic_payment_methods: { enabled: true },
+    payment_method_types: ['card', 'link'],
     metadata: {
       userId: session.user.id,
       type: 'order_payment',
