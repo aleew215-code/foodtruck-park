@@ -8,11 +8,12 @@ export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { foodTruckId, items, orderType, tableNumber, pickupTime, notes, paymentMethod, subtotal } = await req.json()
+  const { foodTruckId, items, orderType, tableNumber, pickupTime, notes, paymentMethod, subtotal, tax } = await req.json()
 
   try {
     const commission = subtotal * 0.024
-    const total = subtotal
+    const taxAmount = typeof tax === 'number' ? tax : subtotal * 0.07
+    const total = subtotal + taxAmount
 
     const order = await prisma.order.create({
       data: {
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
         paymentMethod: paymentMethod === 'WALLET' ? 'WALLET' : 'CARD',
         paymentStatus: paymentMethod === 'WALLET' ? 'COMPLETED' : 'PENDING',
         status: paymentMethod === 'WALLET' ? 'CONFIRMED' : 'PENDING',
-        items: { create: items.map((i: any) => ({ menuItemId: i.menuItemId || null, comboId: i.comboId || null, name: i.name, price: i.price, quantity: i.quantity })) },
+        items: { create: items.map((i: any) => ({ menuItemId: i.menuItemId || null, comboId: i.comboId || null, name: i.name, price: i.price, quantity: i.quantity, notes: i.notes || null })) },
       },
       include: { foodTruck: true, items: true },
     })

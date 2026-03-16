@@ -25,8 +25,11 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false)
   const [truckDetails, setTruckDetails] = useState<Record<string, any>>({})
 
+  const FL_TAX_RATE = 0.07 // Florida state (6%) + county (1%) sales tax
   const trucks = Array.from(new Set(items.map(i => i.foodTruckId)))
-  const total = items.reduce((s, i) => s + i.price * i.quantity, 0)
+  const subtotalBeforeTax = items.reduce((s, i) => s + i.price * i.quantity, 0)
+  const taxAmount = subtotalBeforeTax * FL_TAX_RATE
+  const total = subtotalBeforeTax + taxAmount
 
   useEffect(() => {
     fetch('/api/user/wallet').then(r => r.json()).then(d => setWalletBalance(d.balance || 0))
@@ -38,26 +41,28 @@ export default function CheckoutPage() {
   async function handleCheckout() {
     if (orderType === 'TABLE_SERVICE' && !table) { toast('Please enter your table number', 'error'); return }
     if (orderType === 'PICKUP' && !pickupTime) { toast('Please select a pickup time', 'error'); return }
-    if (paymentMethod === 'WALLET' && walletBalance < total) { toast('Insufficient wallet balance', 'error'); return }
+    if (paymentMethod === 'WALLET' && walletBalance < total) { toast(`Insufficient wallet balance. Need ${formatCurrency(total)}`, 'error'); return }
 
     setLoading(true)
     try {
       // Create one order per food truck
       const orderPromises = trucks.map(truckId => {
         const truckItems = items.filter(i => i.foodTruckId === truckId)
-        const subtotal = truckItems.reduce((s, i) => s + i.price * i.quantity, 0)
+        const truckSubtotal = truckItems.reduce((s, i) => s + i.price * i.quantity, 0)
+        const truckTax = truckSubtotal * FL_TAX_RATE
         return fetch('/api/orders', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             foodTruckId: truckId,
-            items: truckItems.map(i => ({ menuItemId: i.menuItemId, comboId: i.comboId, name: i.name, price: i.price, quantity: i.quantity })),
+            items: truckItems.map(i => ({ menuItemId: i.menuItemId, comboId: i.comboId, name: i.name, price: i.price, quantity: i.quantity, notes: i.notes })),
             orderType,
             tableNumber: orderType === 'TABLE_SERVICE' ? parseInt(table) : null,
             pickupTime: orderType === 'PICKUP' ? pickupTime : null,
             notes,
             paymentMethod,
-            subtotal,
+            subtotal: truckSubtotal,
+            tax: truckTax,
           }),
         }).then(r => r.json())
       })
@@ -155,14 +160,31 @@ export default function CheckoutPage() {
       <div className="bg-white rounded-2xl border border-gray-100 p-6">
         <h2 className="font-semibold text-gray-900 mb-3">Order Summary</h2>
         {items.map(item => (
-          <div key={`${item.id}-${item.foodTruckId}`} className="flex justify-between text-sm py-1">
-            <span className="text-gray-600">{item.quantity}x {item.name}</span>
-            <span className="font-medium">{formatCurrency(item.price * item.quantity)}</span>
+          <div key={`${item.id}-${item.foodTruckId}`} className="py-1">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">{item.quantity}x {item.name}</span>
+              <span className="font-medium">{formatCurrency(item.price * item.quantity)}</span>
+            </div>
+            {item.notes && (
+              <p className="text-xs text-orange-600 mt-0.5 ml-3">📝 {item.notes}</p>
+            )}
           </div>
         ))}
-        <div className="border-t border-gray-100 mt-3 pt-3 flex justify-between font-semibold">
-          <span>Total</span>
-          <span className="text-orange-500">{formatCurrency(total)}</span>
+        <div className="border-t border-gray-100 mt-3 pt-3 space-y-1.5">
+          <div className="flex justify-between text-sm text-gray-600">
+            <span>Subtotal</span>
+            <span>{formatCurrency(subtotalBeforeTax)}</span>
+          </div>
+          <div className="flex justify-between text-sm text-gray-500">
+            <span className="flex items-center gap-1">
+              FL Sales Tax <span className="text-xs bg-gray-100 px-1.5 py-0.5 rounded-md font-medium">7%</span>
+            </span>
+            <span>{formatCurrency(taxAmount)}</span>
+          </div>
+          <div className="flex justify-between font-bold text-gray-900 pt-1 border-t border-gray-100">
+            <span>Total</span>
+            <span className="text-orange-500">{formatCurrency(total)}</span>
+          </div>
         </div>
         <Button onClick={handleCheckout} className="w-full mt-4" size="lg" disabled={loading}>
           {loading ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : null}

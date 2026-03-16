@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
-import { ArrowLeft, Star, Clock, Plus, Minus, ShoppingCart, AlertCircle } from 'lucide-react'
+import { ArrowLeft, Star, Clock, Plus, Minus, ShoppingCart, AlertCircle, X, ChevronDown, ChevronUp } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -54,7 +54,11 @@ export default function TruckMenuPage() {
   const [truck, setTruck] = useState<TruckDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState<string>('all')
-  const [quantities, setQuantities] = useState<Record<string, number>>({})
+
+  // Customization modal state
+  const [customItem, setCustomItem] = useState<MenuItem | null>(null)
+  const [customQty, setCustomQty] = useState(1)
+  const [customNotes, setCustomNotes] = useState('')
 
   useEffect(() => {
     fetch(`/api/trucks/${id}`)
@@ -66,18 +70,36 @@ export default function TruckMenuPage() {
   const cartTotal = cartItems.reduce((s, i) => s + i.price * i.quantity, 0)
 
   function getCartQuantity(itemId: string) {
-    return cartItems.find(i => i.menuItemId === itemId)?.quantity || 0
+    return cartItems.filter(i => i.menuItemId === itemId).reduce((s, i) => s + i.quantity, 0)
   }
 
-  function handleAdd(item: MenuItem) {
-    addItem({ id: item.id, foodTruckId: id as string, foodTruckName: truck!.name, menuItemId: item.id, name: item.name, price: item.price, quantity: 1, image: item.image || undefined })
+  function openCustomize(item: MenuItem) {
+    setCustomItem(item)
+    setCustomQty(1)
+    setCustomNotes('')
+  }
+
+  function confirmAdd() {
+    if (!customItem || !truck) return
+    addItem({
+      id: `${customItem.id}-${Date.now()}`,
+      foodTruckId: id as string,
+      foodTruckName: truck.name,
+      menuItemId: customItem.id,
+      name: customItem.name,
+      price: customItem.price,
+      quantity: customQty,
+      notes: customNotes.trim() || undefined,
+      image: customItem.image || undefined,
+    })
+    setCustomItem(null)
   }
 
   function handleRemove(item: MenuItem) {
-    const cartItem = cartItems.find(i => i.menuItemId === item.id)
+    const cartItem = [...cartItems].reverse().find(i => i.menuItemId === item.id)
     if (cartItem) {
-      if (cartItem.quantity > 1) updateQuantity(item.id, id as string, cartItem.quantity - 1)
-      else removeItem(item.id, id as string)
+      if (cartItem.quantity > 1) updateQuantity(cartItem.id, id as string, cartItem.quantity - 1)
+      else removeItem(cartItem.id, id as string)
     }
   }
 
@@ -179,7 +201,11 @@ export default function TruckMenuPage() {
                 <div className="flex items-center justify-between mt-3">
                   <div />
                   {qty === 0 ? (
-                    <button onClick={() => handleAdd(item)} disabled={!truck.isOpen} className="flex items-center gap-1.5 bg-orange-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-orange-600 transition disabled:opacity-50">
+                    <button
+                      onClick={() => truck.isOpen && openCustomize(item)}
+                      disabled={!truck.isOpen}
+                      className="flex items-center gap-1.5 bg-orange-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-orange-600 transition disabled:opacity-50"
+                    >
                       <Plus className="h-4 w-4" /> Add
                     </button>
                   ) : (
@@ -188,7 +214,7 @@ export default function TruckMenuPage() {
                         <Minus className="h-4 w-4" />
                       </button>
                       <span className="w-6 text-center font-semibold">{qty}</span>
-                      <button onClick={() => handleAdd(item)} className="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center text-white hover:bg-orange-600 transition">
+                      <button onClick={() => openCustomize(item)} className="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center text-white hover:bg-orange-600 transition">
                         <Plus className="h-4 w-4" />
                       </button>
                     </div>
@@ -239,6 +265,85 @@ export default function TruckMenuPage() {
                 <span>{formatCurrency(cartTotal)}</span>
               </Button>
             </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Customization Modal */}
+      {customItem && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl overflow-hidden shadow-2xl">
+            {/* Header */}
+            <div className="relative">
+              {customItem.image ? (
+                <div className="relative h-48 w-full">
+                  <Image src={customItem.image} alt={customItem.name} fill className="object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-4 left-4 text-white">
+                    <h3 className="text-xl font-bold">{customItem.name}</h3>
+                    <p className="text-orange-300 font-semibold">{formatCurrency(customItem.price)}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="px-5 pt-5 pb-3">
+                  <h3 className="text-xl font-bold text-gray-900">{customItem.name}</h3>
+                  <p className="text-orange-500 font-semibold">{formatCurrency(customItem.price)}</p>
+                </div>
+              )}
+              <button onClick={() => setCustomItem(null)} className="absolute top-3 right-3 h-8 w-8 rounded-full bg-black/40 flex items-center justify-center text-white hover:bg-black/60 transition">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4">
+              {customItem.description && (
+                <p className="text-sm text-gray-500">{customItem.description}</p>
+              )}
+
+              {/* Allergens */}
+              {customItem.allergens.length > 0 && (
+                <div className="flex items-center gap-2 bg-amber-50 rounded-lg px-3 py-2">
+                  <AlertCircle className="h-4 w-4 text-amber-500 shrink-0" />
+                  <span className="text-xs text-amber-700 font-medium">Contains: {customItem.allergens.join(', ')}</span>
+                </div>
+              )}
+
+              {/* Special instructions */}
+              <div>
+                <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
+                  Special instructions <span className="text-gray-400 font-normal">(optional)</span>
+                </label>
+                <textarea
+                  value={customNotes}
+                  onChange={e => setCustomNotes(e.target.value)}
+                  placeholder="e.g. No onions, extra cheese, well done, gluten-free..."
+                  rows={3}
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 resize-none placeholder:text-gray-400"
+                />
+              </div>
+
+              {/* Quantity + Add button */}
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 bg-gray-100 rounded-xl px-3 py-2">
+                  <button
+                    onClick={() => setCustomQty(q => Math.max(1, q - 1))}
+                    className="h-7 w-7 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:border-orange-400 hover:text-orange-500 transition shadow-sm"
+                  >
+                    <Minus className="h-3.5 w-3.5" />
+                  </button>
+                  <span className="w-6 text-center font-bold text-gray-900">{customQty}</span>
+                  <button
+                    onClick={() => setCustomQty(q => q + 1)}
+                    className="h-7 w-7 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:border-orange-400 hover:text-orange-500 transition shadow-sm"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+                <Button onClick={confirmAdd} className="flex-1 h-11 text-base font-semibold">
+                  Add {customQty > 1 ? `${customQty} ×` : ''} {formatCurrency(customItem.price * customQty)}
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       )}
