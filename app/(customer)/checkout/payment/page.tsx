@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { loadStripe } from '@stripe/stripe-js'
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from '@stripe/react-stripe-js'
-import { ArrowLeft, Truck, Lock } from 'lucide-react'
+import { ArrowLeft, Truck, Lock, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
@@ -27,11 +27,8 @@ export default function CheckoutPaymentPage() {
     })
       .then(r => r.json())
       .then(d => {
-        if (d.clientSecret) {
-          setClientSecret(d.clientSecret)
-        } else {
-          setError(d.error || 'Failed to initialize payment')
-        }
+        if (d.clientSecret) setClientSecret(d.clientSecret)
+        else setError(d.error || 'Failed to initialize payment')
       })
       .catch(() => setError('Failed to connect to payment service'))
   }, [])
@@ -46,45 +43,80 @@ export default function CheckoutPaymentPage() {
   }
 
   return (
-    // Break out of the layout's px-4 py-6 pb-32 padding
-    <div className="-mx-4 -mt-6 -mb-32 min-h-screen flex flex-col">
+    /* Break out of layout padding entirely — take the full viewport */
+    <div className="-mx-4 -mt-6 -mb-32 min-h-screen flex flex-col" style={{ background: '#0a0a0a' }}>
 
-      {/* Branded header */}
-      <div className="bg-white border-b border-gray-100 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center gap-3">
-          <Link
-            href="/checkout"
-            className="p-2 rounded-full hover:bg-gray-100 transition text-gray-400 hover:text-gray-600"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
+      {/* ── Branded header ── */}
+      <div className="relative z-10" style={{ background: '#111111', borderBottom: '1px solid #222' }}>
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 
-          <div className="flex items-center gap-2 text-orange-500 font-bold text-xl">
-            <Truck className="h-6 w-6" />
-            <span>FoodTruck Park</span>
+          {/* Left: back + logo */}
+          <div className="flex items-center gap-3">
+            <Link
+              href="/checkout"
+              className="p-2 rounded-full transition text-gray-500 hover:text-white hover:bg-white/10"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+
+            <div className="h-6 w-px bg-white/10 mx-1" />
+
+            <div className="flex items-center gap-2">
+              <div className="bg-orange-500 rounded-lg p-1.5">
+                <Truck className="h-5 w-5 text-white" />
+              </div>
+              <span className="text-white font-bold text-lg tracking-tight">FoodTruck Park</span>
+            </div>
           </div>
 
-          <div className="h-5 w-px bg-gray-200 mx-1" />
-
-          <span className="text-sm text-gray-400 flex items-center gap-1.5">
-            <Lock className="h-3.5 w-3.5 text-green-500" />
-            Secure Checkout
-          </span>
+          {/* Right: secure badge */}
+          <div className="flex items-center gap-2 text-xs text-gray-400 bg-white/5 border border-white/10 rounded-full px-3 py-1.5">
+            <ShieldCheck className="h-3.5 w-3.5 text-green-400" />
+            <span>256-bit SSL · Powered by Stripe</span>
+          </div>
         </div>
       </div>
 
-      {/* Stripe — full width, no container wrapper */}
-      <div className="flex-1">
+      {/* ── Stripe embedded checkout ── */}
+      <div className="flex-1 flex flex-col">
         {!clientSecret ? (
-          <div className="flex flex-col items-center justify-center py-24 gap-3">
-            <div className="h-10 w-10 rounded-full border-4 border-orange-200 border-t-orange-500 animate-spin" />
-            <p className="text-gray-500 text-sm">Loading secure payment form...</p>
+          <div className="flex flex-col items-center justify-center flex-1 gap-4 py-32">
+            <div className="h-12 w-12 rounded-full border-4 border-white/10 border-t-orange-500 animate-spin" />
+            <p className="text-gray-500 text-sm">Loading secure payment form…</p>
           </div>
         ) : (
-          <EmbeddedCheckoutProvider stripe={stripePromise} options={{ clientSecret }}>
-            <EmbeddedCheckout />
-          </EmbeddedCheckoutProvider>
+          <>
+            {/* On desktop → constrain width and center so no ugly side gaps */}
+            <div className="hidden lg:flex flex-1 items-start justify-center py-8 px-6">
+              <div
+                className="w-full rounded-2xl overflow-hidden shadow-2xl"
+                style={{ maxWidth: '960px', boxShadow: '0 0 0 1px #222, 0 25px 60px rgba(0,0,0,0.8)' }}
+              >
+                <EmbeddedCheckoutProvider stripe={stripePromise} options={{ clientSecret }}>
+                  <EmbeddedCheckout />
+                </EmbeddedCheckoutProvider>
+              </div>
+            </div>
+
+            {/* On mobile/tablet → full width, no extra padding */}
+            <div className="lg:hidden flex-1">
+              <EmbeddedCheckoutProvider stripe={stripePromise} options={{ clientSecret }}>
+                <EmbeddedCheckout />
+              </EmbeddedCheckoutProvider>
+            </div>
+          </>
         )}
+      </div>
+
+      {/* ── Footer trust bar ── */}
+      <div className="py-4 flex items-center justify-center gap-6 text-xs text-gray-600">
+        <span className="flex items-center gap-1.5">
+          <Lock className="h-3 w-3" /> End-to-end encrypted
+        </span>
+        <span className="w-px h-3 bg-gray-700" />
+        <span>No card details stored</span>
+        <span className="w-px h-3 bg-gray-700" />
+        <span>Cancel anytime before pickup</span>
       </div>
     </div>
   )
