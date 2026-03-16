@@ -58,7 +58,30 @@ export default function TruckMenuPage() {
   // Customization modal state
   const [customItem, setCustomItem] = useState<MenuItem | null>(null)
   const [customQty, setCustomQty] = useState(1)
-  const [customNotes, setCustomNotes] = useState('')
+  const [customMods, setCustomMods] = useState<string[]>([])
+
+  const MOD_OPTIONS = [
+    { label: 'No onions', emoji: '🧅' },
+    { label: 'No tomatoes', emoji: '🍅' },
+    { label: 'No lettuce', emoji: '🥬' },
+    { label: 'No sauce', emoji: '🫙' },
+    { label: 'No salt', emoji: '🧂' },
+    { label: 'Extra cheese', emoji: '🧀' },
+    { label: 'Extra sauce', emoji: '➕' },
+    { label: 'Extra meat', emoji: '🥩' },
+    { label: 'Extra guac', emoji: '🥑' },
+    { label: 'Extra spicy', emoji: '🌶️' },
+    { label: 'Mild', emoji: '😊' },
+    { label: 'Well done', emoji: '🍳' },
+    { label: 'Gluten-free', emoji: '🌿' },
+    { label: 'No bread', emoji: '🚫' },
+  ]
+
+  function toggleMod(label: string) {
+    setCustomMods(prev =>
+      prev.includes(label) ? prev.filter(m => m !== label) : [...prev, label]
+    )
+  }
 
   useEffect(() => {
     fetch(`/api/trucks/${id}`)
@@ -76,7 +99,7 @@ export default function TruckMenuPage() {
   function openCustomize(item: MenuItem) {
     setCustomItem(item)
     setCustomQty(1)
-    setCustomNotes('')
+    setCustomMods([])
   }
 
   function confirmAdd() {
@@ -89,7 +112,7 @@ export default function TruckMenuPage() {
       name: customItem.name,
       price: customItem.price,
       quantity: customQty,
-      notes: customNotes.trim() || undefined,
+      notes: customMods.length > 0 ? customMods.join(', ') : undefined,
       image: customItem.image || undefined,
     })
     setCustomItem(null)
@@ -308,18 +331,35 @@ export default function TruckMenuPage() {
                 </div>
               )}
 
-              {/* Special instructions */}
+              {/* Ingredient modifications */}
               <div>
-                <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
-                  Special instructions <span className="text-gray-400 font-normal">(optional)</span>
-                </label>
-                <textarea
-                  value={customNotes}
-                  onChange={e => setCustomNotes(e.target.value)}
-                  placeholder="e.g. No onions, extra cheese, well done, gluten-free..."
-                  rows={3}
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 resize-none placeholder:text-gray-400"
-                />
+                <p className="text-sm font-semibold text-gray-700 mb-2.5">
+                  Customize <span className="text-gray-400 font-normal">(optional)</span>
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {MOD_OPTIONS.map(mod => {
+                    const active = customMods.includes(mod.label)
+                    return (
+                      <button
+                        key={mod.label}
+                        onClick={() => toggleMod(mod.label)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
+                          active
+                            ? 'bg-orange-500 border-orange-500 text-white shadow-sm scale-105'
+                            : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-orange-300 hover:bg-orange-50'
+                        }`}
+                      >
+                        <span>{mod.emoji}</span>
+                        <span>{mod.label}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+                {customMods.length > 0 && (
+                  <p className="text-xs text-orange-600 mt-2 font-medium">
+                    ✓ {customMods.join(' · ')}
+                  </p>
+                )}
               </div>
 
               {/* Quantity + Add button */}
