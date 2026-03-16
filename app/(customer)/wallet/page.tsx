@@ -31,7 +31,13 @@ export default function WalletPage() {
     try {
       const res = await fetch('/api/user/wallet/topup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amount: amt }) })
       const d = await res.json()
-      if (d.url) window.location.href = d.url
+      if (d.url) {
+        window.location.href = d.url
+      } else {
+        toast(d.error || 'Payment is not configured yet. Please contact support.', 'error')
+      }
+    } catch {
+      toast('Something went wrong. Please try again.', 'error')
     } finally { setAdding(false) }
   }
 

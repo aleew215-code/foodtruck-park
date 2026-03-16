@@ -5,6 +5,9 @@ import { getStripe } from '@/lib/stripe'
 export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY === 'sk_test_...') {
+    return NextResponse.json({ error: 'Payment system not configured yet.' }, { status: 503 })
+  }
   const { amount } = await req.json()
   const checkoutSession = await getStripe().checkout.sessions.create({
     mode: 'payment',
