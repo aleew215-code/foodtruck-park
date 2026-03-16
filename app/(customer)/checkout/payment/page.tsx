@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { loadStripe } from '@stripe/stripe-js'
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from '@stripe/react-stripe-js'
-import { ArrowLeft, Truck, Lock, ShieldCheck } from 'lucide-react'
+import { ArrowLeft, Lock, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
@@ -46,31 +46,18 @@ export default function CheckoutPaymentPage() {
     /* Break out of layout padding entirely — take the full viewport */
     <div className="-mx-4 -mt-6 -mb-32 min-h-screen flex flex-col" style={{ background: '#0a0a0a' }}>
 
-      {/* ── Branded header ── */}
-      <div className="relative z-10" style={{ background: '#111111', borderBottom: '1px solid #222' }}>
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      {/* ── Minimal top bar (back + secure badge, no logo duplication) ── */}
+      <div className="relative z-10" style={{ background: '#111111', borderBottom: '1px solid #1f1f1f' }}>
+        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+          <Link
+            href="/checkout"
+            className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to cart
+          </Link>
 
-          {/* Left: back + logo */}
-          <div className="flex items-center gap-3">
-            <Link
-              href="/checkout"
-              className="p-2 rounded-full transition text-gray-500 hover:text-white hover:bg-white/10"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
-
-            <div className="h-6 w-px bg-white/10 mx-1" />
-
-            <div className="flex items-center gap-2">
-              <div className="bg-orange-500 rounded-lg p-1.5">
-                <Truck className="h-5 w-5 text-white" />
-              </div>
-              <span className="text-white font-bold text-lg tracking-tight">FoodTruck Park</span>
-            </div>
-          </div>
-
-          {/* Right: secure badge */}
-          <div className="flex items-center gap-2 text-xs text-gray-400 bg-white/5 border border-white/10 rounded-full px-3 py-1.5">
+          <div className="flex items-center gap-2 text-xs text-gray-500 bg-white/5 border border-white/10 rounded-full px-3 py-1.5">
             <ShieldCheck className="h-3.5 w-3.5 text-green-400" />
             <span>256-bit SSL · Powered by Stripe</span>
           </div>
