@@ -18,10 +18,9 @@ export async function POST(req: NextRequest) {
 
   if (!orders.length) return NextResponse.json({ error: 'Orders not found' }, { status: 404 })
 
-  const total = orders.reduce((s, o) => s + o.total, 0)
-
-  const lineItems = orders.flatMap(order =>
-    order.items.map(item => ({
+  // Build line items including taxes per order
+  const lineItems = orders.flatMap(order => {
+    const items = order.items.map(item => ({
       price_data: {
         currency: 'usd',
         product_data: { name: `${item.name} (${order.foodTruck.name})` },
@@ -29,14 +28,30 @@ export async function POST(req: NextRequest) {
       },
       quantity: item.quantity,
     }))
-  )
+
+    // Add taxes & service fees as a separate line item
+    const taxAmount = order.total - order.subtotal
+    if (taxAmount > 0.005) {
+      items.push({
+        price_data: {
+          currency: 'usd',
+          product_data: { name: 'Taxes & Service Fees' },
+          unit_amount: Math.round(taxAmount * 100),
+        },
+        quantity: 1,
+      })
+    }
+
+    return items
+  })
+
+  const returnUrl = `${process.env.NEXTAUTH_URL}/checkout/success?orders=${orderIds.join(',')}&session_id={CHECKOUT_SESSION_ID}`
 
   const checkoutSession = await getStripe().checkout.sessions.create({
     mode: 'payment',
-    payment_method_types: ['card'],
+    ui_mode: 'embedded',
     line_items: lineItems,
-    success_url: `${process.env.NEXTAUTH_URL}/checkout/success?orders=${orderIds.join(',')}&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.NEXTAUTH_URL}/orders`,
+    return_url: returnUrl,
     metadata: {
       userId: session.user.id,
       type: 'order_payment',
@@ -44,5 +59,5 @@ export async function POST(req: NextRequest) {
     },
   })
 
-  return NextResponse.json({ url: checkoutSession.url })
+  return NextResponse.json({ clientSecret: checkoutSession.client_secret })
 }

@@ -176,9 +176,7 @@ export default function CheckoutPage() {
             <span>{formatCurrency(subtotalBeforeTax)}</span>
           </div>
           <div className="flex justify-between text-sm text-gray-500">
-            <span className="flex items-center gap-1">
-              FL Sales Tax <span className="text-xs bg-gray-100 px-1.5 py-0.5 rounded-md font-medium">7%</span>
-            </span>
+            <span>Taxes & Service Fees</span>
             <span>{formatCurrency(taxAmount)}</span>
           </div>
           <div className="flex justify-between font-bold text-gray-900 pt-1 border-t border-gray-100">
