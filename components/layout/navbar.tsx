@@ -19,25 +19,36 @@ export function Navbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
 
         {/* ── Logo ──────────────────────────────────────────── */}
-        <Link href="/" className="flex items-center gap-2.5 font-bold text-xl">
+        <Link href="/" className="flex items-center gap-3 font-black text-xl select-none">
+          {/* 3D logo icon */}
           <div className="relative">
+            {/* Glow halo */}
             <div
-              className="absolute inset-0 rounded-lg blur-md"
-              style={{ background: 'rgba(249,115,22,0.45)', transform: 'scale(1.2)' }}
+              className="absolute inset-0 rounded-xl blur-lg"
+              style={{ background: 'rgba(249,115,22,0.55)', transform: 'scale(1.3)', zIndex: 0 }}
             />
+            {/* Icon face */}
             <div
-              className="relative flex items-center justify-center rounded-lg p-1.5"
-              style={{ background: 'linear-gradient(135deg, #f97316 0%, #ea6c00 100%)' }}
+              className="relative z-10 flex items-center justify-center rounded-xl p-2"
+              style={{
+                background: 'linear-gradient(145deg, #f97316 0%, #c2520e 55%, #7c3210 100%)',
+                boxShadow: '0 4px 16px rgba(249,115,22,0.50), 0 1px 0 rgba(255,255,255,0.28) inset, 0 -1px 0 rgba(0,0,0,0.30) inset',
+                transform: 'perspective(300px) rotateX(6deg)',
+              }}
             >
-              <Truck className="h-5 w-5 text-white" />
+              <Truck className="h-5 w-5 text-white drop-shadow" />
             </div>
           </div>
-          <span style={{
-            background: 'linear-gradient(90deg, #f97316 0%, #fbbf24 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-          }}>
+
+          <span
+            style={{
+              background: 'linear-gradient(90deg, #f97316 0%, #fbbf24 50%, #fb923c 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              letterSpacing: '-0.02em',
+            }}
+          >
             FoodTruck Park
           </span>
         </Link>
@@ -52,14 +63,17 @@ export function Navbar() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="text-zinc-300 hover:text-white transition"
-                    style={{ background: 'rgba(255,255,255,0.05)' }}
+                    className="transition"
+                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
                   >
-                    <ShoppingCart className="h-5 w-5" />
+                    <ShoppingCart className="h-5 w-5 text-white/70" />
                     {itemCount > 0 && (
                       <span
-                        className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white ag-glow-btn"
-                        style={{ background: '#f97316' }}
+                        className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-black text-white ag-pop"
+                        style={{
+                          background: 'linear-gradient(135deg, #f97316, #ea6c00)',
+                          boxShadow: '0 0 10px rgba(249,115,22,0.65)',
+                        }}
                       >
                         {itemCount}
                       </span>
@@ -72,13 +86,19 @@ export function Navbar() {
               <div className="relative">
                 <button
                   onClick={() => setMenuOpen(!menuOpen)}
-                  className="flex items-center gap-2 rounded-full px-2 py-1 transition"
-                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)' }}
+                  className="flex items-center gap-2 rounded-full px-2 py-1 transition ag-press"
+                  style={{
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.10)',
+                  }}
                 >
                   <Avatar src={session.user?.image} name={session.user?.name} size="sm" />
                   <ChevronDown
-                    className="h-4 w-4 transition-transform"
-                    style={{ color: 'rgba(255,255,255,0.5)', transform: menuOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                    className="h-4 w-4 transition-transform duration-300"
+                    style={{
+                      color: 'rgba(255,255,255,0.45)',
+                      transform: menuOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                    }}
                   />
                 </button>
 
@@ -86,43 +106,36 @@ export function Navbar() {
                 {menuOpen && (
                   <div className="ag-dropdown absolute right-0 top-12 w-56 rounded-2xl z-50 overflow-hidden animate-fadeIn">
                     {/* User info */}
-                    <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                      <p className="font-semibold text-sm text-white truncate">{session.user?.name}</p>
-                      <p className="text-xs truncate" style={{ color: 'rgba(255,255,255,0.38)' }}>{session.user?.email}</p>
+                    <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <p className="font-bold text-sm text-white truncate">{session.user?.name}</p>
+                      <p className="text-xs truncate" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                        {session.user?.email}
+                      </p>
                     </div>
 
                     {role === 'CUSTOMER' && (
                       <>
-                        <Link
-                          href="/orders"
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm transition"
-                          style={{ color: 'rgba(255,255,255,0.65)' }}
-                          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
-                          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                          onClick={() => setMenuOpen(false)}
-                        >
-                          <ShoppingCart className="h-4 w-4 text-orange-400" /> My Orders
-                        </Link>
-                        <Link
-                          href="/wallet"
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm transition"
-                          style={{ color: 'rgba(255,255,255,0.65)' }}
-                          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
-                          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                          onClick={() => setMenuOpen(false)}
-                        >
-                          <span className="text-orange-400 text-base">💳</span> Wallet
-                        </Link>
-                        <Link
-                          href="/profile"
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm transition"
-                          style={{ color: 'rgba(255,255,255,0.65)' }}
-                          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
-                          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                          onClick={() => setMenuOpen(false)}
-                        >
-                          <Settings className="h-4 w-4 text-orange-400" /> Profile
-                        </Link>
+                        {[
+                          { href: '/orders',  icon: ShoppingCart, label: 'My Orders' },
+                          { href: '/wallet',  icon: null,         label: '💳 Wallet' },
+                          { href: '/profile', icon: Settings,     label: 'Profile'   },
+                        ].map(({ href, icon: Icon, label }) => (
+                          <Link
+                            key={href}
+                            href={href}
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm transition"
+                            style={{ color: 'rgba(255,255,255,0.60)' }}
+                            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+                            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                            onClick={() => setMenuOpen(false)}
+                          >
+                            {Icon
+                              ? <Icon className="h-4 w-4 text-orange-400" />
+                              : <span className="text-base">{label.split(' ')[0]}</span>
+                            }
+                            {Icon ? label : label.split(' ').slice(1).join(' ')}
+                          </Link>
+                        ))}
                       </>
                     )}
 
@@ -130,8 +143,8 @@ export function Navbar() {
                       <Link
                         href="/dashboard"
                         className="flex items-center gap-3 px-4 py-2.5 text-sm transition"
-                        style={{ color: 'rgba(255,255,255,0.65)' }}
-                        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+                        style={{ color: 'rgba(255,255,255,0.60)' }}
+                        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
                         onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                         onClick={() => setMenuOpen(false)}
                       >
@@ -143,8 +156,8 @@ export function Navbar() {
                       <Link
                         href="/admin"
                         className="flex items-center gap-3 px-4 py-2.5 text-sm transition"
-                        style={{ color: 'rgba(255,255,255,0.65)' }}
-                        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+                        style={{ color: 'rgba(255,255,255,0.60)' }}
+                        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
                         onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                         onClick={() => setMenuOpen(false)}
                       >
@@ -155,8 +168,8 @@ export function Navbar() {
                     <button
                       onClick={() => { setMenuOpen(false); signOut({ callbackUrl: '/login' }) }}
                       className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-400 transition"
-                      style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}
-                      onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.08)')}
+                      style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+                      onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.07)')}
                       onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                     >
                       <LogOut className="h-4 w-4" /> Sign Out
@@ -168,23 +181,10 @@ export function Navbar() {
           ) : (
             <div className="flex items-center gap-2">
               <Link href="/login">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-zinc-300 hover:text-white"
-                  style={{ background: 'rgba(255,255,255,0.05)' }}
-                >
-                  Login
-                </Button>
+                <Button variant="ghost" size="sm">Login</Button>
               </Link>
               <Link href="/register">
-                <Button
-                  size="sm"
-                  className="ag-glow-btn text-white font-semibold"
-                  style={{ background: 'linear-gradient(135deg, #f97316 0%, #ea6c00 100%)' }}
-                >
-                  Sign Up
-                </Button>
+                <Button size="sm">Sign Up</Button>
               </Link>
             </div>
           )}

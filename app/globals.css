@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -5,6 +6,28 @@
   --foreground: #171717;
   --primary: #f97316;
   --primary-dark: #ea6c00;
+
+  /* 3D depth tokens */
+  --depth-1: 0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.25);
+  --depth-2: 0 4px 16px rgba(0,0,0,0.5), 0 12px 40px rgba(0,0,0,0.35);
+  --depth-3: 0 8px 32px rgba(0,0,0,0.6), 0 24px 64px rgba(0,0,0,0.45), 0 0 80px rgba(249,115,22,0.08);
+  --depth-hover: 0 20px 60px rgba(0,0,0,0.7), 0 0 60px rgba(249,115,22,0.18), 0 1px 0 rgba(255,255,255,0.10) inset;
+
+  /* Neon glow tokens */
+  --neon-orange: 0 0 20px rgba(249,115,22,0.50), 0 0 60px rgba(249,115,22,0.20), 0 0 100px rgba(249,115,22,0.08);
+  --neon-orange-strong: 0 0 30px rgba(249,115,22,0.75), 0 0 80px rgba(249,115,22,0.35), 0 0 120px rgba(249,115,22,0.15);
+  --neon-amber: 0 0 20px rgba(251,191,36,0.35), 0 0 50px rgba(251,191,36,0.12);
+
+  /* Glass surface tokens */
+  --glass-surface: rgba(255,255,255,0.04);
+  --glass-border: rgba(255,255,255,0.08);
+  --glass-surface-hover: rgba(255,255,255,0.09);
+  --glass-border-hover: rgba(249,115,22,0.45);
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -20,51 +43,46 @@ body {
   overflow: hidden;
 }
 
+/* =============================================================
+   KEYFRAMES
+   ============================================================= */
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .animate-fadeIn { animation: fadeIn 0.3s ease forwards; }
 
 @keyframes pulse-ring {
-  0% { transform: scale(0.8); opacity: 1; }
-  100% { transform: scale(2); opacity: 0; }
+  0%   { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2);   opacity: 0; }
 }
-
-/* ─────────────────────────────────────────────────────────────
-   ANTI-GRAVITY DESIGN SYSTEM
-   All classes are prefixed with "ag-" to avoid conflicts
-───────────────────────────────────────────────────────────── */
-
-/* ── Keyframes ─────────────────────────────────────────────── */
 
 @keyframes ag-float {
-  0%, 100% { transform: translateY(0px);  }
+  0%, 100% { transform: translateY(0px); }
   50%       { transform: translateY(-10px); }
 }
-
 @keyframes ag-float-slow {
-  0%, 100% { transform: translateY(0px);  }
+  0%, 100% { transform: translateY(0px); }
   50%       { transform: translateY(-16px); }
 }
 
 @keyframes ag-orb-a {
-  0%   { transform: translate(0,    0)    scale(1);    }
-  30%  { transform: translate(60px, -45px) scale(1.08); }
-  60%  { transform: translate(-35px, 25px) scale(0.94); }
-  100% { transform: translate(0,    0)    scale(1);    }
+  0%   { transform: translate(0,    0)     scale(1); }
+  30%  { transform: translate(60px,-45px)  scale(1.08); }
+  60%  { transform: translate(-35px,25px)  scale(0.94); }
+  100% { transform: translate(0,    0)     scale(1); }
 }
-
 @keyframes ag-orb-b {
-  0%   { transform: translate(0,    0)    scale(1);    }
-  35%  { transform: translate(-55px, 40px) scale(1.06); }
-  70%  { transform: translate(40px, -30px) scale(0.97); }
-  100% { transform: translate(0,    0)    scale(1);    }
+  0%   { transform: translate(0,    0)     scale(1); }
+  35%  { transform: translate(-55px,40px)  scale(1.06); }
+  70%  { transform: translate(40px,-30px)  scale(0.97); }
+  100% { transform: translate(0,    0)     scale(1); }
 }
 
 @keyframes ag-card-rise {
-  from { opacity: 0; transform: translateY(32px) scale(0.96); }
-  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+  from { opacity: 0; transform: translateY(40px) scale(0.95) rotateX(4deg); }
+  to   { opacity: 1; transform: translateY(0)    scale(1)    rotateX(0deg); }
 }
 
 @keyframes ag-shimmer {
@@ -73,50 +91,159 @@ body {
 }
 
 @keyframes ag-glow-pulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(249,115,22,0.25), 0 0 60px rgba(249,115,22,0.06); }
-  50%       { box-shadow: 0 0 40px rgba(249,115,22,0.50), 0 0 100px rgba(249,115,22,0.15); }
+  0%, 100% { box-shadow: var(--neon-orange); }
+  50%       { box-shadow: var(--neon-orange-strong); }
 }
 
 @keyframes ag-spin-slow {
-  from { transform: rotate(0deg);   }
+  from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
 
-/* ── Float utilities ───────────────────────────────────────── */
-.ag-float      { animation: ag-float      5s ease-in-out infinite;       }
-.ag-float-slow { animation: ag-float-slow 8s ease-in-out infinite;       }
-.ag-float-d1   { animation: ag-float      5s ease-in-out 0.9s infinite;  }
-.ag-float-d2   { animation: ag-float      5s ease-in-out 1.8s infinite;  }
-.ag-float-d3   { animation: ag-float-slow 8s ease-in-out 1.3s infinite;  }
+@keyframes ag-page-enter {
+  from { opacity: 0; transform: translateY(20px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
 
-/* ── Card entrance ─────────────────────────────────────────── */
-/* Use animation-delay inline style for per-card stagger */
+@keyframes ag-skeleton-pulse {
+  0%, 100% { opacity: 0.12; }
+  50%       { opacity: 0.28; }
+}
+
+@keyframes ag-nav-indicator {
+  from { width: 0; opacity: 0; }
+  to   { width: 32px; opacity: 1; }
+}
+
+@keyframes ag-pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}
+
+@keyframes ag-3d-rise {
+  from {
+    opacity: 0;
+    transform: perspective(800px) translateY(50px) rotateX(12deg) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(800px) translateY(0) rotateX(0deg) scale(1);
+  }
+}
+
+@keyframes ag-logo-spin {
+  0%   { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}
+
+@keyframes ag-border-run {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes ag-spotlight {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50%       { opacity: 0.55; transform: scale(1.08); }
+}
+
+/* =============================================================
+   FLOAT UTILITIES
+   ============================================================= */
+.ag-float      { animation: ag-float      5s ease-in-out infinite; }
+.ag-float-slow { animation: ag-float-slow 8s ease-in-out infinite; }
+.ag-float-d1   { animation: ag-float      5s ease-in-out 0.9s infinite; }
+.ag-float-d2   { animation: ag-float      5s ease-in-out 1.8s infinite; }
+.ag-float-d3   { animation: ag-float-slow 8s ease-in-out 1.3s infinite; }
+
+/* =============================================================
+   CARD ENTRANCE ANIMATIONS
+   ============================================================= */
 .ag-card-rise {
   opacity: 0;
-  animation: ag-card-rise 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: ag-card-rise 0.70s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-/* ── Glass card ────────────────────────────────────────────── */
+.ag-3d-rise {
+  opacity: 0;
+  animation: ag-3d-rise 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.ag-page-enter {
+  animation: ag-page-enter 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* =============================================================
+   GLASS SURFACES
+   ============================================================= */
 .ag-glass {
-  background:          rgba(255, 255, 255, 0.04);
-  backdrop-filter:     blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid   rgba(255, 255, 255, 0.08);
+  background:              var(--glass-surface);
+  backdrop-filter:         blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid        var(--glass-border);
+  box-shadow:              var(--depth-1);
 }
 
+/* Standard hover — for use with TiltCard (no transform) */
 .ag-glass-hover {
-  /* transform is intentionally excluded — TiltCard handles 3D transform on hover */
   transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
 }
-
 .ag-glass-hover:hover {
-  background:   rgba(255, 255, 255, 0.07);
-  border-color: rgba(249, 115, 22, 0.38);
-  box-shadow:   0 28px 70px rgba(0,0,0,0.55), 0 0 45px rgba(249,115,22,0.13);
-  /* No transform here — TiltCard provides the 3D tilt + lift */
+  background:   var(--glass-surface-hover);
+  border-color: var(--glass-border-hover);
+  box-shadow:   var(--depth-hover);
 }
 
-/* ── Gradient text (animated shimmer) ──────────────────────── */
+/* Strong hover — includes translateY lift (non-TiltCard cards) */
+.ag-glass-hover-lg {
+  transition: background 0.3s ease, border-color 0.3s ease,
+              box-shadow 0.3s ease, transform 0.3s cubic-bezier(0.22,1,0.36,1);
+}
+.ag-glass-hover-lg:hover {
+  background:   var(--glass-surface-hover);
+  border-color: var(--glass-border-hover);
+  box-shadow:   var(--depth-hover);
+  transform:    translateY(-4px) scale(1.012);
+}
+
+/* Ultra 3D hover — full perspective tilt for premium cards */
+.ag-glass-3d {
+  transform-style: preserve-3d;
+  transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
+}
+.ag-glass-3d:hover {
+  background:   var(--glass-surface-hover);
+  border-color: var(--glass-border-hover);
+  box-shadow:   var(--depth-hover);
+  transform:    perspective(800px) translateY(-6px) rotateX(2deg) scale(1.015);
+}
+
+/* =============================================================
+   ANIMATED BORDER (running gradient outline)
+   ============================================================= */
+.ag-border-run {
+  position: relative;
+  border: none !important;
+}
+.ag-border-run::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(249,115,22,0.70), rgba(251,191,36,0.40), rgba(249,115,22,0.10), rgba(249,115,22,0.70));
+  background-size: 300% 300%;
+  animation: ag-border-run 4s ease infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* =============================================================
+   GRADIENT TEXT (animated shimmer)
+   ============================================================= */
 .ag-gradient-text {
   background: linear-gradient(120deg, #f97316 0%, #fbbf24 40%, #fb923c 75%, #f97316 100%);
   background-size: 200% auto;
@@ -126,46 +253,171 @@ body {
   animation: ag-shimmer 4.5s linear infinite;
 }
 
-/* ── Glowing button ────────────────────────────────────────── */
+.ag-gradient-text-static {
+  background: linear-gradient(135deg, #f97316 0%, #fbbf24 60%, #fb923c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* =============================================================
+   GLOWING BUTTONS
+   ============================================================= */
 .ag-glow-btn {
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
-  box-shadow: 0 0 22px rgba(249,115,22,0.38), inset 0 1px 0 rgba(255,255,255,0.18);
+  transition: box-shadow 0.25s ease, transform 0.2s ease;
+  box-shadow: var(--neon-orange), inset 0 1px 0 rgba(255,255,255,0.18);
 }
 .ag-glow-btn:hover {
-  box-shadow: 0 0 42px rgba(249,115,22,0.58), 0 10px 32px rgba(249,115,22,0.30),
-              inset 0 1px 0 rgba(255,255,255,0.18);
+  box-shadow: var(--neon-orange-strong), inset 0 1px 0 rgba(255,255,255,0.20);
   transform: translateY(-2px);
 }
-
-/* ── Dark glass nav ────────────────────────────────────────── */
-.ag-nav {
-  background:          rgba(10, 8, 6, 0.82) !important;
-  backdrop-filter:     blur(28px) !important;
-  -webkit-backdrop-filter: blur(28px) !important;
-  border-bottom: 1px solid rgba(249, 115, 22, 0.13) !important;
-  box-shadow:    0 4px 32px rgba(0,0,0,0.35) !important;
+.ag-glow-btn:active {
+  transform: scale(0.97) translateY(0);
+  box-shadow: 0 0 18px rgba(249,115,22,0.50), inset 0 1px 0 rgba(255,255,255,0.12);
 }
 
-/* ── Dark glass input ──────────────────────────────────────── */
+/* =============================================================
+   NEON GLOW ELEMENTS
+   ============================================================= */
+.ag-neon-ring {
+  box-shadow: 0 0 0 1px rgba(249,115,22,0.40),
+              0 0 20px rgba(249,115,22,0.25),
+              0 0 50px rgba(249,115,22,0.10),
+              inset 0 0 20px rgba(249,115,22,0.05);
+}
+
+.ag-neon-text {
+  text-shadow: 0 0 10px rgba(249,115,22,0.80),
+               0 0 30px rgba(249,115,22,0.40),
+               0 0 60px rgba(249,115,22,0.20);
+}
+
+/* =============================================================
+   PRESS MICRO-INTERACTION
+   ============================================================= */
+.ag-press {
+  transition: transform 0.12s ease;
+}
+.ag-press:active {
+  transform: scale(0.93);
+}
+
+.ag-pop { animation: ag-pop 0.3s cubic-bezier(0.36,0.07,0.19,0.97) forwards; }
+
+/* =============================================================
+   SKELETON / LOADING
+   ============================================================= */
+.ag-skeleton {
+  background: rgba(255,255,255,0.07);
+  border-radius: 8px;
+  animation: ag-skeleton-pulse 1.8s ease-in-out infinite;
+}
+
+/* =============================================================
+   TOP NAV
+   ============================================================= */
+.ag-nav {
+  background:               rgba(8, 6, 4, 0.85) !important;
+  backdrop-filter:          blur(32px) saturate(180%) !important;
+  -webkit-backdrop-filter:  blur(32px) saturate(180%) !important;
+  border-bottom: 1px solid  rgba(249,115,22,0.15) !important;
+  box-shadow:               0 4px 40px rgba(0,0,0,0.50), 0 1px 0 rgba(249,115,22,0.08) inset !important;
+}
+
+/* =============================================================
+   BOTTOM NAVIGATION BAR
+   ============================================================= */
+.ag-bottom-nav {
+  background:              rgba(8, 6, 4, 0.92);
+  backdrop-filter:         blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border-top: 1px solid    rgba(255,255,255,0.06);
+  box-shadow:              0 -4px 40px rgba(0,0,0,0.50),
+                           0 -1px 0 rgba(249,115,22,0.06) inset;
+}
+
+.ag-bottom-nav-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  flex: 1;
+  padding: 8px 4px;
+  color: rgba(255,255,255,0.32);
+  transition: color 0.22s ease, transform 0.12s ease;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  text-decoration: none;
+}
+.ag-bottom-nav-item.active { color: #f97316; }
+.ag-bottom-nav-item.active::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 32px; height: 2px;
+  border-radius: 0 0 4px 4px;
+  background: linear-gradient(90deg, #f97316, #fbbf24);
+  animation: ag-nav-indicator 0.25s ease forwards;
+}
+.ag-bottom-nav-item:active { transform: scale(0.88); }
+
+/* =============================================================
+   INPUTS
+   ============================================================= */
 .ag-input {
-  background:   rgba(255, 255, 255, 0.06) !important;
-  border-color: rgba(255, 255, 255, 0.10) !important;
+  background:   rgba(255,255,255,0.05) !important;
+  border-color: rgba(255,255,255,0.09) !important;
   color:        #ffffff !important;
   transition:   background 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 .ag-input:focus {
-  background:   rgba(255, 255, 255, 0.09) !important;
-  border-color: rgba(249, 115, 22, 0.55) !important;
-  box-shadow:   0 0 0 3px rgba(249, 115, 22, 0.12) !important;
+  background:   rgba(255,255,255,0.08) !important;
+  border-color: rgba(249,115,22,0.60) !important;
+  box-shadow:   0 0 0 3px rgba(249,115,22,0.14), 0 0 20px rgba(249,115,22,0.10) !important;
   outline:      none !important;
 }
-.ag-input::placeholder { color: rgba(255,255,255,0.28) !important; }
+.ag-input::placeholder { color: rgba(255,255,255,0.25) !important; }
 
-/* ── Dropdown (dark glass) ─────────────────────────────────── */
+/* =============================================================
+   DROPDOWN
+   ============================================================= */
 .ag-dropdown {
-  background:    rgba(18, 14, 10, 0.95) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-  border: 1px solid rgba(255,255,255,0.09) !important;
-  box-shadow:    0 28px 64px rgba(0,0,0,0.65), 0 0 32px rgba(249,115,22,0.07) !important;
+  background:               rgba(14, 10, 7, 0.96) !important;
+  backdrop-filter:          blur(28px) saturate(180%) !important;
+  -webkit-backdrop-filter:  blur(28px) saturate(180%) !important;
+  border: 1px solid         rgba(255,255,255,0.08) !important;
+  box-shadow:               0 32px 80px rgba(0,0,0,0.70), var(--neon-amber) !important;
+}
+
+/* =============================================================
+   SPOTLIGHT BACKGROUND ELEMENT
+   ============================================================= */
+.ag-spotlight {
+  animation: ag-spotlight 6s ease-in-out infinite;
+}
+
+/* =============================================================
+   SECTION DIVIDERS
+   ============================================================= */
+.ag-divider { border-color: rgba(255,255,255,0.05); }
+
+/* =============================================================
+   3D CARD INNER HIGHLIGHT (top-left edge light)
+   ============================================================= */
+.ag-inner-shine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.08) 0%,
+    transparent 40%,
+    transparent 60%,
+    rgba(0,0,0,0.12) 100%
+  );
+  pointer-events: none;
 }

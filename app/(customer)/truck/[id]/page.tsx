@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
-import { ArrowLeft, Star, Clock, Plus, Minus, ShoppingCart, AlertCircle, X, ChevronDown, ChevronUp } from 'lucide-react'
+import { ArrowLeft, Star, Clock, Plus, Minus, ShoppingCart, AlertCircle, X } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -61,20 +61,20 @@ export default function TruckMenuPage() {
   const [customMods, setCustomMods] = useState<string[]>([])
 
   const MOD_OPTIONS = [
-    { label: 'No onions', emoji: '🧅' },
-    { label: 'No tomatoes', emoji: '🍅' },
-    { label: 'No lettuce', emoji: '🥬' },
-    { label: 'No sauce', emoji: '🫙' },
-    { label: 'No salt', emoji: '🧂' },
+    { label: 'No onions',    emoji: '🧅' },
+    { label: 'No tomatoes',  emoji: '🍅' },
+    { label: 'No lettuce',   emoji: '🥬' },
+    { label: 'No sauce',     emoji: '🫙' },
+    { label: 'No salt',      emoji: '🧂' },
     { label: 'Extra cheese', emoji: '🧀' },
-    { label: 'Extra sauce', emoji: '➕' },
-    { label: 'Extra meat', emoji: '🥩' },
-    { label: 'Extra guac', emoji: '🥑' },
-    { label: 'Extra spicy', emoji: '🌶️' },
-    { label: 'Mild', emoji: '😊' },
-    { label: 'Well done', emoji: '🍳' },
-    { label: 'Gluten-free', emoji: '🌿' },
-    { label: 'No bread', emoji: '🚫' },
+    { label: 'Extra sauce',  emoji: '➕' },
+    { label: 'Extra meat',   emoji: '🥩' },
+    { label: 'Extra guac',   emoji: '🥑' },
+    { label: 'Extra spicy',  emoji: '🌶️' },
+    { label: 'Mild',         emoji: '😊' },
+    { label: 'Well done',    emoji: '🍳' },
+    { label: 'Gluten-free',  emoji: '🌿' },
+    { label: 'No bread',     emoji: '🚫' },
   ]
 
   function toggleMod(label: string) {
@@ -126,118 +126,265 @@ export default function TruckMenuPage() {
     }
   }
 
-  if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
-  if (!truck) return <div className="text-center py-20 text-gray-500">Food truck not found</div>
+  if (loading) return (
+    <div className="flex justify-center py-20">
+      <Spinner size="lg" />
+    </div>
+  )
+  if (!truck) return (
+    <div className="text-center py-20" style={{ color: 'rgba(255,255,255,0.40)' }}>
+      Food truck not found
+    </div>
+  )
 
   const allItems = [...truck.uncategorized, ...truck.categories.flatMap(c => c.items)]
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-3xl mx-auto ag-page-enter" style={{ paddingBottom: cartItems.length > 0 ? '96px' : '0' }}>
+
       {/* Back */}
-      <Link href="/marketplace" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-4">
-        <ArrowLeft className="h-4 w-4" /> Back to marketplace
+      <Link
+        href="/marketplace"
+        className="inline-flex items-center gap-2 text-sm mb-4 transition"
+        style={{ color: 'rgba(255,255,255,0.45)' }}
+        onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.85)')}
+        onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.45)')}
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to marketplace
       </Link>
 
-      {/* Header */}
-      <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-orange-100 to-amber-50 h-48 mb-6">
+      {/* ── Hero Header ──────────────────────────────────────── */}
+      <div
+        className="relative rounded-2xl overflow-hidden mb-5"
+        style={{ height: '220px' }}
+      >
+        {/* Background gradient fallback */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(135deg, rgba(249,115,22,0.25) 0%, rgba(251,191,36,0.12) 100%)',
+          }}
+        />
+
+        {/* Cover image */}
         {(truck.coverImage || truck.logo) && (
-          <Image src={truck.coverImage || truck.logo!} alt={truck.name} fill className="object-cover" />
+          <Image
+            src={truck.coverImage || truck.logo!}
+            alt={truck.name}
+            fill
+            className="object-cover"
+          />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        <div className="absolute bottom-4 left-4 text-white">
-          <div className="flex items-center gap-2 mb-1">
-            <Badge variant={truck.isOpen ? 'success' : 'destructive'}>{truck.isOpen ? 'Open' : 'Closed'}</Badge>
-            {truck.tableServiceEnabled && <Badge variant="secondary" className="bg-white/20 text-white border-0">Table Service</Badge>}
-          </div>
-          <h1 className="text-2xl font-bold">{truck.name}</h1>
-          {truck.cuisine && <p className="text-sm text-white/80">{truck.cuisine}</p>}
+
+        {/* Dark-to-transparent top overlay */}
+        <div
+          className="absolute inset-0"
+          style={{ background: 'linear-gradient(to bottom, rgba(12,10,7,0.40) 0%, transparent 40%, rgba(12,10,7,0.75) 100%)' }}
+        />
+
+        {/* Badges row */}
+        <div className="absolute top-4 left-4 flex items-center gap-2">
+          <Badge variant={truck.isOpen ? 'success' : 'destructive'}>
+            {truck.isOpen ? 'Open' : 'Closed'}
+          </Badge>
+          {truck.tableServiceEnabled && (
+            <Badge variant="secondary" className="bg-white/15 text-white border-0 backdrop-blur-sm">
+              Table Service
+            </Badge>
+          )}
+        </div>
+
+        {/* Truck info bottom */}
+        <div className="absolute bottom-4 left-4 right-4">
+          <h1 className="text-3xl font-extrabold text-white tracking-tight drop-shadow-lg">
+            {truck.name}
+          </h1>
+          {truck.cuisine && (
+            <p className="text-sm mt-0.5" style={{ color: 'rgba(255,255,255,0.70)' }}>
+              {truck.cuisine}
+            </p>
+          )}
         </div>
       </div>
 
-      <div className="flex items-center gap-6 text-sm text-gray-600 mb-6">
-        <div className="flex items-center gap-1">
+      {/* ── Stats Strip ──────────────────────────────────────── */}
+      <div
+        className="ag-glass rounded-2xl px-4 py-3 flex items-center gap-5 mb-5"
+      >
+        <div className="flex items-center gap-1.5">
           <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-          <span className="font-medium">{truck.rating > 0 ? truck.rating.toFixed(1) : 'No ratings yet'}</span>
-          {truck.totalRatings > 0 && <span className="text-gray-400">({truck.totalRatings})</span>}
+          <span className="font-bold text-sm text-white">
+            {truck.rating > 0 ? truck.rating.toFixed(1) : 'New'}
+          </span>
+          {truck.totalRatings > 0 && (
+            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              ({truck.totalRatings})
+            </span>
+          )}
         </div>
-        <div className="flex items-center gap-1">
-          <Clock className="h-4 w-4 text-gray-400" />
-          <span>{truck.avgPrepTime} min prep time</span>
+        <div className="flex items-center gap-1.5">
+          <Clock className="h-4 w-4 text-orange-400" />
+          <span className="text-sm" style={{ color: 'rgba(255,255,255,0.70)' }}>
+            {truck.avgPrepTime} min
+          </span>
         </div>
+        {truck.description && (
+          <p
+            className="text-xs ml-auto text-right line-clamp-2 max-w-[55%]"
+            style={{ color: 'rgba(255,255,255,0.38)' }}
+          >
+            {truck.description}
+          </p>
+        )}
       </div>
 
-      {truck.description && <p className="text-gray-600 mb-6">{truck.description}</p>}
-
-      {/* Promotions */}
+      {/* ── Promotions ───────────────────────────────────────── */}
       {truck.promotions.filter(p => p.isActive).map(promo => (
-        <div key={promo.id} className="mb-4 rounded-xl bg-orange-50 border border-orange-200 px-4 py-3 flex items-center gap-3">
-          <span className="text-xl">🎉</span>
-          <div>
-            <p className="font-semibold text-orange-800 text-sm">{promo.name}</p>
-            {promo.description && <p className="text-xs text-orange-600">{promo.description}</p>}
+        <div
+          key={promo.id}
+          className="ag-glass rounded-2xl px-4 py-3 flex items-center gap-3 mb-4"
+          style={{ borderLeft: '3px solid rgba(249,115,22,0.70)' }}
+        >
+          <span className="text-xl shrink-0">🎉</span>
+          <div className="min-w-0">
+            <p className="font-bold text-sm text-white truncate">{promo.name}</p>
+            {promo.description && (
+              <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                {promo.description}
+              </p>
+            )}
           </div>
-          <Badge className="ml-auto">
+          <Badge className="ml-auto shrink-0">
             {promo.discountType === 'percentage' ? `${promo.discountValue}% OFF` : `$${promo.discountValue} OFF`}
           </Badge>
         </div>
       ))}
 
-      {/* Category tabs */}
+      {/* ── Category Tabs ─────────────────────────────────────── */}
       {truck.categories.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto pb-2 mb-6 scrollbar-hide">
-          <button onClick={() => setActiveCategory('all')} className={`shrink-0 px-4 py-2 rounded-full text-sm font-medium transition ${activeCategory === 'all' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>All</button>
-          {truck.categories.map(cat => (
-            <button key={cat.id} onClick={() => setActiveCategory(cat.id)} className={`shrink-0 px-4 py-2 rounded-full text-sm font-medium transition ${activeCategory === cat.id ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{cat.name}</button>
-          ))}
-          {truck.combos.length > 0 && <button onClick={() => setActiveCategory('combos')} className={`shrink-0 px-4 py-2 rounded-full text-sm font-medium transition ${activeCategory === 'combos' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>Combos</button>}
+        <div className="flex gap-2 overflow-x-auto pb-2 mb-5 scrollbar-hide">
+          {['all', ...truck.categories.map(c => c.id), ...(truck.combos.length > 0 ? ['combos'] : [])].map(catId => {
+            const isActive = activeCategory === catId
+            const label = catId === 'all'
+              ? 'All'
+              : catId === 'combos'
+              ? 'Combos'
+              : truck.categories.find(c => c.id === catId)?.name ?? catId
+            return (
+              <button
+                key={catId}
+                onClick={() => setActiveCategory(catId)}
+                className="shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition ag-press"
+                style={{
+                  background: isActive
+                    ? 'linear-gradient(135deg, #f97316, #ea6c00)'
+                    : 'rgba(255,255,255,0.06)',
+                  border: isActive
+                    ? 'none'
+                    : '1px solid rgba(255,255,255,0.09)',
+                  color: isActive ? '#fff' : 'rgba(255,255,255,0.55)',
+                  boxShadow: isActive ? '0 0 14px rgba(249,115,22,0.35)' : 'none',
+                }}
+              >
+                {label}
+              </button>
+            )
+          })}
         </div>
       )}
 
-      {/* Menu Items */}
+      {/* ── Menu Items ───────────────────────────────────────── */}
       <div className="space-y-3">
-        {(activeCategory === 'all' ? allItems : activeCategory === 'combos' ? [] : truck.categories.find(c => c.id === activeCategory)?.items || []).filter(item => item.isAvailable).map(item => {
+        {(
+          activeCategory === 'all'
+            ? allItems
+            : activeCategory === 'combos'
+            ? []
+            : truck.categories.find(c => c.id === activeCategory)?.items || []
+        ).filter(item => item.isAvailable).map(item => {
           const qty = getCartQuantity(item.id)
           return (
-            <div key={item.id} className="bg-white rounded-xl border border-gray-100 p-4 flex gap-4">
+            <div
+              key={item.id}
+              className="ag-glass ag-glass-hover-lg rounded-2xl p-4 flex gap-4"
+            >
+              {/* Item image */}
               {item.image && (
-                <div className="relative h-20 w-20 rounded-lg overflow-hidden shrink-0">
+                <div className="relative h-24 w-24 rounded-xl overflow-hidden shrink-0">
                   <Image src={item.image} alt={item.name} fill className="object-cover" />
                 </div>
               )}
+
+              {/* Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-medium text-gray-900">{item.name}</h3>
-                      {item.isPopular && <Badge variant="warning" className="text-[10px]">Popular</Badge>}
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="font-bold text-white truncate">{item.name}</h3>
+                      {item.isPopular && (
+                        <Badge variant="warning" className="text-[10px] shrink-0">Popular</Badge>
+                      )}
                     </div>
-                    {item.description && <p className="text-sm text-gray-500 mt-0.5 line-clamp-2">{item.description}</p>}
+                    {item.description && (
+                      <p className="text-sm mt-0.5 line-clamp-2" style={{ color: 'rgba(255,255,255,0.42)' }}>
+                        {item.description}
+                      </p>
+                    )}
                     {item.allergens.length > 0 && (
-                      <div className="flex items-center gap-1 mt-1">
-                        <AlertCircle className="h-3 w-3 text-amber-500" />
-                        <span className="text-xs text-amber-600">{item.allergens.join(', ')}</span>
+                      <div className="flex items-center gap-1 mt-1.5">
+                        <AlertCircle className="h-3 w-3 text-amber-400 shrink-0" />
+                        <span className="text-xs" style={{ color: 'rgba(251,191,36,0.80)' }}>
+                          {item.allergens.join(', ')}
+                        </span>
                       </div>
                     )}
                   </div>
-                  <span className="font-semibold text-gray-900 shrink-0">{formatCurrency(item.price)}</span>
+                  <span
+                    className="font-extrabold text-base shrink-0"
+                    style={{ color: '#f97316' }}
+                  >
+                    {formatCurrency(item.price)}
+                  </span>
                 </div>
-                <div className="flex items-center justify-between mt-3">
-                  <div />
+
+                {/* Add / Qty controls */}
+                <div className="flex items-center justify-end mt-3">
                   {qty === 0 ? (
                     <button
                       onClick={() => truck.isOpen && openCustomize(item)}
                       disabled={!truck.isOpen}
-                      className="flex items-center gap-1.5 bg-orange-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-orange-600 transition disabled:opacity-50"
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold text-white ag-glow-btn ag-press disabled:opacity-40"
+                      style={{
+                        background: 'linear-gradient(135deg, #f97316, #ea6c00)',
+                        boxShadow: '0 0 18px rgba(249,115,22,0.35)',
+                      }}
                     >
-                      <Plus className="h-4 w-4" /> Add
+                      <Plus className="h-4 w-4" />
+                      Add
                     </button>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <button onClick={() => handleRemove(item)} className="h-8 w-8 rounded-full border-2 border-orange-500 flex items-center justify-center text-orange-500 hover:bg-orange-50 transition">
+                      <button
+                        onClick={() => handleRemove(item)}
+                        className="h-8 w-8 rounded-full flex items-center justify-center ag-press transition"
+                        style={{
+                          background: 'rgba(249,115,22,0.12)',
+                          border: '1.5px solid rgba(249,115,22,0.45)',
+                          color: '#f97316',
+                        }}
+                      >
                         <Minus className="h-4 w-4" />
                       </button>
-                      <span className="w-6 text-center font-semibold">{qty}</span>
-                      <button onClick={() => openCustomize(item)} className="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center text-white hover:bg-orange-600 transition">
+                      <span className="w-7 text-center font-extrabold text-white">{qty}</span>
+                      <button
+                        onClick={() => openCustomize(item)}
+                        className="h-8 w-8 rounded-full flex items-center justify-center text-white ag-press transition"
+                        style={{
+                          background: 'linear-gradient(135deg, #f97316, #ea6c00)',
+                          boxShadow: '0 0 12px rgba(249,115,22,0.40)',
+                        }}
+                      >
                         <Plus className="h-4 w-4" />
                       </button>
                     </div>
@@ -250,9 +397,9 @@ export default function TruckMenuPage() {
 
         {/* Combos */}
         {activeCategory === 'combos' && truck.combos.filter(c => c.isAvailable).map(combo => (
-          <div key={combo.id} className="bg-white rounded-xl border border-orange-100 p-4 flex gap-4">
+          <div key={combo.id} className="ag-glass ag-glass-hover-lg rounded-2xl p-4 flex gap-4">
             {combo.image && (
-              <div className="relative h-20 w-20 rounded-lg overflow-hidden shrink-0">
+              <div className="relative h-24 w-24 rounded-xl overflow-hidden shrink-0">
                 <Image src={combo.image} alt={combo.name} fill className="object-cover" />
               </div>
             )}
@@ -260,81 +407,145 @@ export default function TruckMenuPage() {
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-medium text-gray-900">{combo.name}</h3>
+                    <h3 className="font-bold text-white">{combo.name}</h3>
                     <Badge variant="secondary">Combo</Badge>
                   </div>
-                  {combo.description && <p className="text-sm text-gray-500 mt-0.5">{combo.description}</p>}
+                  {combo.description && (
+                    <p className="text-sm mt-0.5" style={{ color: 'rgba(255,255,255,0.42)' }}>
+                      {combo.description}
+                    </p>
+                  )}
                 </div>
-                <span className="font-semibold text-gray-900">{formatCurrency(combo.price)}</span>
+                <span className="font-extrabold text-base shrink-0" style={{ color: '#f97316' }}>
+                  {formatCurrency(combo.price)}
+                </span>
               </div>
-              <button onClick={() => { addItem({ id: combo.id, foodTruckId: id as string, foodTruckName: truck.name, comboId: combo.id, name: combo.name, price: combo.price, quantity: 1 }); }} disabled={!truck.isOpen} className="mt-3 flex items-center gap-1.5 bg-orange-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-orange-600 transition disabled:opacity-50">
-                <Plus className="h-4 w-4" /> Add Combo
-              </button>
+              <div className="flex justify-end mt-3">
+                <button
+                  onClick={() => {
+                    addItem({
+                      id: combo.id,
+                      foodTruckId: id as string,
+                      foodTruckName: truck.name,
+                      comboId: combo.id,
+                      name: combo.name,
+                      price: combo.price,
+                      quantity: 1,
+                    })
+                  }}
+                  disabled={!truck.isOpen}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold text-white ag-glow-btn ag-press disabled:opacity-40"
+                  style={{ background: 'linear-gradient(135deg, #f97316, #ea6c00)' }}
+                >
+                  <Plus className="h-4 w-4" />
+                  Add Combo
+                </button>
+              </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Cart Sticky Footer */}
+      {/* ── Sticky Cart Footer ───────────────────────────────── */}
       {cartItems.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 shadow-lg z-30">
+        <div
+          className="fixed bottom-0 left-0 right-0 z-30 p-4 ag-bottom-nav"
+          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }}
+        >
           <div className="max-w-3xl mx-auto">
             <Link href="/cart">
-              <Button className="w-full flex items-center justify-between h-12 text-base">
+              <Button
+                className="w-full h-13 text-base"
+                style={{ height: '52px' }}
+                size="lg"
+              >
                 <span className="flex items-center gap-2">
                   <ShoppingCart className="h-5 w-5" />
                   View Cart ({cartItems.reduce((s, i) => s + i.quantity, 0)} items)
                 </span>
-                <span>{formatCurrency(cartTotal)}</span>
+                <span className="ml-auto font-extrabold">{formatCurrency(cartTotal)}</span>
               </Button>
             </Link>
           </div>
         </div>
       )}
 
-      {/* Customization Modal */}
+      {/* ── Customization Modal (dark glass bottom sheet) ─────── */}
       {customItem && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl overflow-hidden shadow-2xl">
-            {/* Header */}
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+          style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(8px)' }}
+          onClick={e => { if (e.target === e.currentTarget) setCustomItem(null) }}
+        >
+          <div
+            className="w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl overflow-hidden animate-fadeIn"
+            style={{
+              background: 'rgba(20,15,10,0.97)',
+              border: '1px solid rgba(255,255,255,0.09)',
+              backdropFilter: 'blur(32px)',
+            }}
+          >
+            {/* Modal header */}
             <div className="relative">
               {customItem.image ? (
-                <div className="relative h-48 w-full">
+                <div className="relative h-52 w-full">
                   <Image src={customItem.image} alt={customItem.name} fill className="object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-4 left-4 text-white">
-                    <h3 className="text-xl font-bold">{customItem.name}</h3>
-                    <p className="text-orange-300 font-semibold">{formatCurrency(customItem.price)}</p>
+                  <div
+                    className="absolute inset-0"
+                    style={{ background: 'linear-gradient(to top, rgba(20,15,10,0.90) 0%, transparent 60%)' }}
+                  />
+                  <div className="absolute bottom-4 left-5 right-12">
+                    <h3 className="text-xl font-extrabold text-white">{customItem.name}</h3>
+                    <p className="font-bold mt-0.5" style={{ color: '#f97316' }}>
+                      {formatCurrency(customItem.price)}
+                    </p>
                   </div>
                 </div>
               ) : (
-                <div className="px-5 pt-5 pb-3">
-                  <h3 className="text-xl font-bold text-gray-900">{customItem.name}</h3>
-                  <p className="text-orange-500 font-semibold">{formatCurrency(customItem.price)}</p>
+                <div className="px-5 pt-5 pb-3 pr-12">
+                  <h3 className="text-xl font-extrabold text-white">{customItem.name}</h3>
+                  <p className="font-bold mt-0.5" style={{ color: '#f97316' }}>
+                    {formatCurrency(customItem.price)}
+                  </p>
                 </div>
               )}
-              <button onClick={() => setCustomItem(null)} className="absolute top-3 right-3 h-8 w-8 rounded-full bg-black/40 flex items-center justify-center text-white hover:bg-black/60 transition">
+              {/* Close button */}
+              <button
+                onClick={() => setCustomItem(null)}
+                className="absolute top-3 right-3 h-8 w-8 rounded-full flex items-center justify-center transition ag-press"
+                style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.85)' }}
+              >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             <div className="p-5 space-y-4">
               {customItem.description && (
-                <p className="text-sm text-gray-500">{customItem.description}</p>
+                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.50)' }}>
+                  {customItem.description}
+                </p>
               )}
 
               {/* Allergens */}
               {customItem.allergens.length > 0 && (
-                <div className="flex items-center gap-2 bg-amber-50 rounded-lg px-3 py-2">
-                  <AlertCircle className="h-4 w-4 text-amber-500 shrink-0" />
-                  <span className="text-xs text-amber-700 font-medium">Contains: {customItem.allergens.join(', ')}</span>
+                <div
+                  className="flex items-center gap-2 rounded-xl px-3 py-2"
+                  style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.18)' }}
+                >
+                  <AlertCircle className="h-4 w-4 text-amber-400 shrink-0" />
+                  <span className="text-xs font-medium" style={{ color: 'rgba(251,191,36,0.90)' }}>
+                    Contains: {customItem.allergens.join(', ')}
+                  </span>
                 </div>
               )}
 
-              {/* Ingredient modifications */}
+              {/* Modifications */}
               <div>
-                <p className="text-sm font-semibold text-gray-700 mb-2.5">
-                  Customize <span className="text-gray-400 font-normal">(optional)</span>
+                <p className="text-sm font-bold text-white mb-2.5">
+                  Customize{' '}
+                  <span className="font-normal" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                    (optional)
+                  </span>
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {MOD_OPTIONS.map(mod => {
@@ -343,11 +554,13 @@ export default function TruckMenuPage() {
                       <button
                         key={mod.label}
                         onClick={() => toggleMod(mod.label)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
-                          active
-                            ? 'bg-orange-500 border-orange-500 text-white shadow-sm scale-105'
-                            : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-orange-300 hover:bg-orange-50'
-                        }`}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition ag-press"
+                        style={{
+                          background: active ? 'rgba(249,115,22,0.20)' : 'rgba(255,255,255,0.05)',
+                          border: active ? '1.5px solid rgba(249,115,22,0.65)' : '1px solid rgba(255,255,255,0.10)',
+                          color: active ? '#f97316' : 'rgba(255,255,255,0.60)',
+                          transform: active ? 'scale(1.04)' : 'scale(1)',
+                        }}
                       >
                         <span>{mod.emoji}</span>
                         <span>{mod.label}</span>
@@ -356,31 +569,43 @@ export default function TruckMenuPage() {
                   })}
                 </div>
                 {customMods.length > 0 && (
-                  <p className="text-xs text-orange-600 mt-2 font-medium">
+                  <p className="text-xs mt-2 font-medium" style={{ color: 'rgba(249,115,22,0.80)' }}>
                     ✓ {customMods.join(' · ')}
                   </p>
                 )}
               </div>
 
-              {/* Quantity + Add button */}
+              {/* Quantity + Add */}
               <div className="flex items-center gap-4">
-                <div className="flex items-center gap-3 bg-gray-100 rounded-xl px-3 py-2">
+                <div
+                  className="flex items-center gap-3 rounded-xl px-3 py-2"
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)' }}
+                >
                   <button
                     onClick={() => setCustomQty(q => Math.max(1, q - 1))}
-                    className="h-7 w-7 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:border-orange-400 hover:text-orange-500 transition shadow-sm"
+                    className="h-7 w-7 rounded-full flex items-center justify-center transition ag-press"
+                    style={{
+                      background: 'rgba(255,255,255,0.08)',
+                      border: '1px solid rgba(255,255,255,0.14)',
+                      color: 'rgba(255,255,255,0.70)',
+                    }}
                   >
                     <Minus className="h-3.5 w-3.5" />
                   </button>
-                  <span className="w-6 text-center font-bold text-gray-900">{customQty}</span>
+                  <span className="w-6 text-center font-extrabold text-white">{customQty}</span>
                   <button
                     onClick={() => setCustomQty(q => q + 1)}
-                    className="h-7 w-7 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:border-orange-400 hover:text-orange-500 transition shadow-sm"
+                    className="h-7 w-7 rounded-full flex items-center justify-center text-white transition ag-press"
+                    style={{
+                      background: 'linear-gradient(135deg, #f97316, #ea6c00)',
+                      boxShadow: '0 0 10px rgba(249,115,22,0.40)',
+                    }}
                   >
                     <Plus className="h-3.5 w-3.5" />
                   </button>
                 </div>
-                <Button onClick={confirmAdd} className="flex-1 h-11 text-base font-semibold">
-                  Add {customQty > 1 ? `${customQty} ×` : ''} {formatCurrency(customItem.price * customQty)}
+                <Button onClick={confirmAdd} className="flex-1 h-11 text-base font-bold" size="lg">
+                  Add{customQty > 1 ? ` ${customQty} ×` : ''} {formatCurrency(customItem.price * customQty)}
                 </Button>
               </div>
             </div>

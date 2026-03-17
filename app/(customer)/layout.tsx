@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { auth } from '@/lib/auth'
 import { Navbar } from '@/components/layout/navbar'
+import { BottomNav } from '@/components/layout/BottomNav'
 import { InstallBanner } from '@/components/pwa/InstallBanner'
 import { CartSync } from '@/components/CartSync'
 import { FloatingParticles } from '@/components/FloatingParticles'
@@ -14,16 +15,16 @@ export default async function CustomerLayout({ children }: { children: React.Rea
   if (role === 'SUPER_ADMIN') redirect('/admin')
 
   return (
-    /* ── Deep dark warm background ─────────────────────────── */
+    /* Deep dark warm background */
     <div className="min-h-screen relative" style={{ background: '#0c0a07' }}>
 
-      {/* ── Mouse-reactive parallax (client, zero DOM) ────────── */}
+      {/* Mouse-reactive parallax (client, zero DOM) */}
       <OrbParallax />
 
-      {/* ── Food particles floating UPWARD (anti-gravity!) ───── */}
+      {/* Food particles floating UPWARD (anti-gravity!) */}
       <FloatingParticles />
 
-      {/* ── Floating background orbs (CSS animation + mouse parallax) ── */}
+      {/* Floating background orbs (CSS animation + mouse parallax) */}
       <div
         aria-hidden="true"
         style={{ position: 'fixed', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}
@@ -56,7 +57,7 @@ export default async function CustomerLayout({ children }: { children: React.Rea
           }} />
         </div>
 
-        {/* Orb C wrapper — moves with cursor at ×0.6 for mid-depth */}
+        {/* Orb C wrapper */}
         <div style={{
           position: 'absolute',
           top: '40%', left: '30%',
@@ -83,11 +84,13 @@ export default async function CustomerLayout({ children }: { children: React.Rea
         }} />
       </div>
 
-      {/* ── All content sits above the background ────────────── */}
+      {/* All content sits above the background */}
       <div style={{ position: 'relative', zIndex: 1 }}>
         <CartSync />
         <Navbar />
-        <main className="mx-auto max-w-7xl px-4 py-6 pb-32">{children}</main>
+        {/* pb-28 on mobile for bottom nav; pb-8 on desktop */}
+        <main className="mx-auto max-w-7xl px-4 py-6 pb-28 lg:pb-8">{children}</main>
+        <BottomNav />
         <InstallBanner />
       </div>
     </div>

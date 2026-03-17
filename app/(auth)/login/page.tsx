@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, Suspense } from 'react'
+import { useState, Suspense } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -25,16 +25,11 @@ function LoginContent() {
     e.preventDefault()
     setLoading(true)
     try {
-      const res = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
-      })
+      const res = await signIn('credentials', { email, password, redirect: false })
       if (res?.error) {
         toast(res.error === 'Account deactivated' ? 'Your account has been deactivated.' : 'Invalid email or password.', 'error')
       } else {
-        const dest = table ? `/marketplace?table=${table}` : '/marketplace'
-        router.push(dest)
+        router.push(table ? `/marketplace?table=${table}` : '/marketplace')
         router.refresh()
       }
     } finally {
@@ -48,23 +43,76 @@ function LoginContent() {
   }
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full max-w-md ag-3d-rise">
+
+      {/* ── Logo + Title ──────────────────────────────────────── */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-orange-500 text-white mb-4 shadow-lg">
-          <Truck className="h-8 w-8" />
+        {/* 3D Logo icon with neon ring + inner shine */}
+        <div className="relative inline-block mb-5">
+          {/* Outer glow halo */}
+          <div
+            className="absolute inset-0 rounded-3xl blur-2xl"
+            style={{ background: 'rgba(249,115,22,0.40)', transform: 'scale(1.5)', zIndex: 0 }}
+          />
+          {/* Icon container */}
+          <div
+            className="relative z-10 flex items-center justify-center w-20 h-20 rounded-3xl ag-neon-ring ag-inner-shine"
+            style={{
+              background: 'linear-gradient(135deg, #f97316 0%, #c2520e 60%, #7c3210 100%)',
+              boxShadow: '0 8px 32px rgba(249,115,22,0.55), 0 2px 8px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.25)',
+              transform: 'perspective(400px) rotateX(8deg)',
+            }}
+          >
+            <Truck className="h-9 w-9 text-white drop-shadow-lg" />
+          </div>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
-        <p className="text-gray-500 mt-1">Sign in to order from your favorite trucks</p>
+
+        <h1
+          className="text-3xl font-black tracking-tight"
+          style={{ color: '#fff' }}
+        >
+          Welcome back
+        </h1>
+        <p className="mt-1.5 text-sm" style={{ color: 'rgba(255,255,255,0.42)' }}>
+          Sign in to order from your favorite trucks
+        </p>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+      {/* ── Card ─────────────────────────────────────────────── */}
+      <div
+        className="ag-glass ag-inner-shine relative rounded-3xl p-8 overflow-hidden"
+        style={{
+          boxShadow: '0 24px 80px rgba(0,0,0,0.70), 0 0 0 1px rgba(255,255,255,0.07), 0 0 60px rgba(249,115,22,0.06)',
+        }}
+      >
+        {/* Subtle corner glow */}
+        <div
+          aria-hidden="true"
+          className="absolute -top-16 -right-16 w-48 h-48 rounded-full pointer-events-none"
+          style={{ background: 'radial-gradient(circle, rgba(249,115,22,0.14) 0%, transparent 70%)' }}
+        />
+
+        {/* Google button */}
         <button
           onClick={handleGoogle}
           disabled={googleLoading}
-          className="w-full flex items-center justify-center gap-3 rounded-lg border border-gray-200 bg-white py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition mb-6 disabled:opacity-60"
+          className="w-full flex items-center justify-center gap-3 rounded-2xl py-3 text-sm font-semibold transition ag-press disabled:opacity-50"
+          style={{
+            background: 'rgba(255,255,255,0.06)',
+            border: '1px solid rgba(255,255,255,0.10)',
+            color: 'rgba(255,255,255,0.85)',
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.background = 'rgba(255,255,255,0.10)'
+            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)'
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = 'rgba(255,255,255,0.06)'
+            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)'
+          }}
         >
           {googleLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin text-orange-400" />
           ) : (
             <svg className="h-5 w-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -76,37 +124,106 @@ function LoginContent() {
           Continue with Google
         </button>
 
-        <div className="relative mb-6">
-          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-100" /></div>
-          <div className="relative flex justify-center text-xs text-gray-400 bg-white px-2">or sign in with email</div>
+        {/* Divider */}
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }} />
+          </div>
+          <div className="relative flex justify-center">
+            <span
+              className="px-3 text-xs font-medium"
+              style={{ background: 'transparent', color: 'rgba(255,255,255,0.28)' }}
+            >
+              or sign in with email
+            </span>
+          </div>
         </div>
 
+        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required className="mt-1" />
+            <Label
+              htmlFor="email"
+              className="text-xs font-semibold uppercase tracking-wider"
+              style={{ color: 'rgba(255,255,255,0.45)' }}
+            >
+              Email
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              required
+              className="mt-1.5 ag-input rounded-xl h-11"
+            />
           </div>
+
           <div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
-              <Link href="/forgot-password" className="text-xs text-orange-500 hover:underline">Forgot password?</Link>
+            <div className="flex items-center justify-between mb-1.5">
+              <Label
+                htmlFor="password"
+                className="text-xs font-semibold uppercase tracking-wider"
+                style={{ color: 'rgba(255,255,255,0.45)' }}
+              >
+                Password
+              </Label>
+              <Link
+                href="/forgot-password"
+                className="text-xs font-medium transition"
+                style={{ color: 'rgba(249,115,22,0.80)' }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#f97316')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(249,115,22,0.80)')}
+              >
+                Forgot password?
+              </Link>
             </div>
-            <div className="relative mt-1">
-              <Input id="password" type={showPw ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
-              <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-2.5 text-gray-400">
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPw ? 'text' : 'password'}
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                className="ag-input rounded-xl h-11"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPw(!showPw)}
+                className="absolute right-3 top-3 transition ag-press"
+                style={{ color: 'rgba(255,255,255,0.30)' }}
+                onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.70)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.30)')}
+              >
                 {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
           </div>
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+
+          <Button
+            type="submit"
+            className="w-full mt-2"
+            size="lg"
+            disabled={loading}
+          >
+            {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
             Sign In
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-500">
+        <p className="mt-6 text-center text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>
           Don't have an account?{' '}
-          <Link href={table ? `/register?table=${table}` : '/register'} className="text-orange-500 font-medium hover:underline">Sign up</Link>
+          <Link
+            href={table ? `/register?table=${table}` : '/register'}
+            className="font-semibold transition"
+            style={{ color: '#f97316' }}
+            onMouseEnter={e => (e.currentTarget.style.color = '#fbbf24')}
+            onMouseLeave={e => (e.currentTarget.style.color = '#f97316')}
+          >
+            Sign up free
+          </Link>
         </p>
       </div>
     </div>
@@ -115,7 +232,9 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="w-full max-w-md h-64 animate-pulse bg-white rounded-2xl" />}>
+    <Suspense fallback={
+      <div className="w-full max-w-md h-[520px] ag-skeleton rounded-3xl" />
+    }>
       <LoginContent />
     </Suspense>
   )
