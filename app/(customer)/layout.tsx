@@ -3,6 +3,8 @@ import { auth } from '@/lib/auth'
 import { Navbar } from '@/components/layout/navbar'
 import { InstallBanner } from '@/components/pwa/InstallBanner'
 import { CartSync } from '@/components/CartSync'
+import { FloatingParticles } from '@/components/FloatingParticles'
+import { OrbParallax } from '@/components/OrbParallax'
 
 export default async function CustomerLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
@@ -15,40 +17,58 @@ export default async function CustomerLayout({ children }: { children: React.Rea
     /* ── Deep dark warm background ─────────────────────────── */
     <div className="min-h-screen relative" style={{ background: '#0c0a07' }}>
 
-      {/* ── Floating background orbs (pure CSS, zero JS) ─────── */}
+      {/* ── Mouse-reactive parallax (client, zero DOM) ────────── */}
+      <OrbParallax />
+
+      {/* ── Food particles floating UPWARD (anti-gravity!) ───── */}
+      <FloatingParticles />
+
+      {/* ── Floating background orbs (CSS animation + mouse parallax) ── */}
       <div
         aria-hidden="true"
         style={{ position: 'fixed', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}
       >
-        {/* Orb A — large warm orange, top-left */}
+        {/* Orb A wrapper — moves WITH cursor */}
         <div style={{
           position: 'absolute',
           top: '-15%', left: '-8%',
-          width: '680px', height: '680px',
-          background: 'radial-gradient(circle, rgba(249,115,22,0.20) 0%, rgba(249,115,22,0.06) 45%, transparent 70%)',
-          borderRadius: '50%',
-          animation: 'ag-orb-a 28s ease-in-out infinite',
-        }} />
+          transform: 'translate(var(--orb-x, 0px), var(--orb-y, 0px))',
+        }}>
+          <div style={{
+            width: '680px', height: '680px',
+            background: 'radial-gradient(circle, rgba(249,115,22,0.20) 0%, rgba(249,115,22,0.06) 45%, transparent 70%)',
+            borderRadius: '50%',
+            animation: 'ag-orb-a 28s ease-in-out infinite',
+          }} />
+        </div>
 
-        {/* Orb B — amber, bottom-right */}
+        {/* Orb B wrapper — moves AGAINST cursor (depth illusion) */}
         <div style={{
           position: 'absolute',
           bottom: '-10%', right: '-8%',
-          width: '750px', height: '750px',
-          background: 'radial-gradient(circle, rgba(251,191,36,0.14) 0%, rgba(251,191,36,0.04) 45%, transparent 70%)',
-          borderRadius: '50%',
-          animation: 'ag-orb-b 34s ease-in-out infinite',
-        }} />
+          transform: 'translate(var(--orb-x2, 0px), var(--orb-y2, 0px))',
+        }}>
+          <div style={{
+            width: '750px', height: '750px',
+            background: 'radial-gradient(circle, rgba(251,191,36,0.14) 0%, rgba(251,191,36,0.04) 45%, transparent 70%)',
+            borderRadius: '50%',
+            animation: 'ag-orb-b 34s ease-in-out infinite',
+          }} />
+        </div>
 
-        {/* Orb C — small soft orange, center-left */}
+        {/* Orb C wrapper — moves with cursor at ×0.6 for mid-depth */}
         <div style={{
           position: 'absolute',
           top: '40%', left: '30%',
-          width: '320px', height: '320px',
-          background: 'radial-gradient(circle, rgba(249,115,22,0.09) 0%, transparent 70%)',
-          borderRadius: '50%',
-          animation: 'ag-orb-a 22s ease-in-out 8s infinite',
-        }} />
+          transform: 'translate(calc(var(--orb-x, 0px) * 0.6), calc(var(--orb-y, 0px) * 0.6))',
+        }}>
+          <div style={{
+            width: '320px', height: '320px',
+            background: 'radial-gradient(circle, rgba(249,115,22,0.09) 0%, transparent 70%)',
+            borderRadius: '50%',
+            animation: 'ag-orb-a 22s ease-in-out 8s infinite',
+          }} />
+        </div>
 
         {/* Subtle grid overlay for depth */}
         <div style={{
@@ -63,7 +83,7 @@ export default async function CustomerLayout({ children }: { children: React.Rea
         }} />
       </div>
 
-      {/* ── All content sits above the orbs ─────────────────── */}
+      {/* ── All content sits above the background ────────────── */}
       <div style={{ position: 'relative', zIndex: 1 }}>
         <CartSync />
         <Navbar />

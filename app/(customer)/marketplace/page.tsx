@@ -5,6 +5,7 @@ import { Search, MapPin, Star, Clock, QrCode } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
+import { TiltCard } from '@/components/ui/tilt-card'
 import { useCart } from '@/hooks/useCart'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -186,7 +187,7 @@ export default function MarketplacePage() {
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((truck, index) => (
             <Link key={truck.id} href={`/truck/${truck.id}`}>
-              <div
+              <TiltCard
                 className="group ag-glass ag-glass-hover rounded-2xl overflow-hidden ag-card-rise"
                 style={{ animationDelay: `${index * 0.07}s` }}
               >
@@ -281,7 +282,7 @@ export default function MarketplacePage() {
                     )}
                   </div>
                 </div>
-              </div>
+              </TiltCard>
             </Link>
           ))}
         </div>
