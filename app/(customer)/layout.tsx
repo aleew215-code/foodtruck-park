@@ -4,7 +4,6 @@ import { Navbar } from '@/components/layout/navbar'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { InstallBanner } from '@/components/pwa/InstallBanner'
 import { CartSync } from '@/components/CartSync'
-import { FloatingParticles } from '@/components/FloatingParticles'
 import { OrbParallax } from '@/components/OrbParallax'
 
 export default async function CustomerLayout({ children }: { children: React.ReactNode }) {
@@ -20,9 +19,6 @@ export default async function CustomerLayout({ children }: { children: React.Rea
 
       {/* Mouse-reactive parallax (client, zero DOM) */}
       <OrbParallax />
-
-      {/* Food particles floating UPWARD (anti-gravity!) */}
-      <FloatingParticles />
 
       {/* Floating background orbs (CSS animation + mouse parallax) */}
       <div
