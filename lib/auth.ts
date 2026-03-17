@@ -51,20 +51,39 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     async jwt({ token, user, trigger, session }) {
       if (user) {
-        token.role = (user as any).role
-        token.tempPassword = (user as any).tempPassword
+        if ((user as any).role) {
+          // Credentials login — role comes directly from authorize()
+          token.role = (user as any).role
+          token.tempPassword = (user as any).tempPassword
+        } else {
+          // Google OAuth — user object is the OAuth profile, not the DB row.
+          // Fetch role + tempPassword from the database using the user id.
+          const dbUser = await prisma.user.findUnique({
+            where: { id: user.id ?? token.sub! },
+            select: { role: true, tempPassword: true },
+          })
+          if (dbUser) {
+            token.role = dbUser.role
+            token.tempPassword = dbUser.tempPassword
+          }
+        }
       }
       if (trigger === 'update' && session) {
-        token.role = session.role
-        token.tempPassword = session.tempPassword
+        // Allow profile page to update name + image in the JWT
+        if (session.name  !== undefined) token.name    = session.name
+        if (session.image !== undefined) token.picture = session.image
+        if (session.role  !== undefined) token.role    = session.role
+        if (session.tempPassword !== undefined) token.tempPassword = session.tempPassword
       }
       return token
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.sub!
-        ;(session.user as any).role = token.role
-        ;(session.user as any).tempPassword = token.tempPassword
+        session.user.id    = token.sub!
+        session.user.name  = (token.name  as string) ?? session.user.name
+        session.user.image = (token.picture as string) ?? session.user.image
+        ;(session.user as any).role          = token.role
+        ;(session.user as any).tempPassword  = token.tempPassword
       }
       return session
     },
