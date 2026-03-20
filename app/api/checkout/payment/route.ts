@@ -52,7 +52,8 @@ export async function POST(req: NextRequest) {
     ui_mode: 'embedded',
     line_items: lineItems,
     return_url: returnUrl,
-    automatic_payment_methods: { enabled: true },
+    // Omitting payment_method_types lets Stripe use all methods enabled
+    // in the Dashboard — this includes Apple Pay, Google Pay, Link, etc.
     metadata: {
       userId: session.user.id,
       type: 'order_payment',

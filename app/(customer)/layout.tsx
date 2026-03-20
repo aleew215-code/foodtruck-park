@@ -5,6 +5,7 @@ import { BottomNav } from '@/components/layout/BottomNav'
 import { InstallBanner } from '@/components/pwa/InstallBanner'
 import { CartSync } from '@/components/CartSync'
 import { OrbParallax } from '@/components/OrbParallax'
+import { PushSetup } from '@/components/PushSetup'
 
 export default async function CustomerLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
@@ -83,6 +84,7 @@ export default async function CustomerLayout({ children }: { children: React.Rea
       {/* All content sits above the background */}
       <div style={{ position: 'relative', zIndex: 1 }}>
         <CartSync />
+        <PushSetup />
         <Navbar />
         {/* pb-28 on mobile for bottom nav; pb-8 on desktop */}
         <main className="mx-auto max-w-7xl px-4 py-6 pb-28 lg:pb-8">{children}</main>

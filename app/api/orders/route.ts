@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { generateOrderNumber } from '@/lib/utils'
 import { sendSMS, getOrderConfirmMessage } from '@/lib/sms'
+import { sendPushNotification } from '@/lib/push'
 
 export async function POST(req: NextRequest) {
   const session = await auth()
@@ -32,7 +33,7 @@ export async function POST(req: NextRequest) {
         status: paymentMethod === 'WALLET' ? 'CONFIRMED' : 'PENDING',
         items: { create: items.map((i: any) => ({ menuItemId: i.menuItemId || null, comboId: i.comboId || null, name: i.name, price: i.price, quantity: i.quantity, notes: i.notes || null })) },
       },
-      include: { foodTruck: true, items: true },
+      include: { foodTruck: { include: { user: true } }, items: true },
     })
 
     // Deduct from wallet if wallet payment
@@ -41,12 +42,26 @@ export async function POST(req: NextRequest) {
       await prisma.walletTransaction.create({ data: { userId: session.user.id, amount: -total, type: 'debit', description: `Order #${order.orderNumber}` } })
     }
 
-    // SMS
+    // SMS to customer
     try {
       const user = await prisma.user.findUnique({ where: { id: session.user.id } })
       if (user?.phone) {
         const msg = getOrderConfirmMessage(order.orderNumber, order.foodTruck.name, order.foodTruck.smsOrderConfirmMsg)
         await sendSMS(user.phone, msg, order.foodTruck.smsFromNumber || undefined)
+      }
+    } catch {}
+
+    // Push notification to food truck owner for new order
+    try {
+      const truckOwner = order.foodTruck.user
+      if (truckOwner?.pushSubscription) {
+        const locationLabel = tableNumber ? `Table ${tableNumber}` : 'Pickup'
+        await sendPushNotification(truckOwner.pushSubscription, {
+          title: '🔔 New Order!',
+          body: `Order #${order.orderNumber} · ${locationLabel} · $${total.toFixed(2)}`,
+          url: '/dashboard/orders',
+          icon: '/icons/icon-192x192.png',
+        })
       }
     } catch {}
 

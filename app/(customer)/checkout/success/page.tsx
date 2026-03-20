@@ -111,13 +111,13 @@ export default function CheckoutSuccessPage() {
           className="text-3xl font-bold text-gray-900 mb-2"
           style={{ transitionDelay: '0.3s', opacity: show ? 1 : 0, transition: 'opacity 0.5s ease 0.3s' }}
         >
-          ¡Orden Confirmada!
+          Order Confirmed!
         </h1>
         <p
           className="text-gray-500 text-lg mb-2"
           style={{ transitionDelay: '0.4s', opacity: show ? 1 : 0, transition: 'opacity 0.5s ease 0.4s' }}
         >
-          Tu pago fue procesado exitosamente
+          Your payment was processed successfully
         </p>
 
         {orderNumbers.length > 0 && (
@@ -126,7 +126,7 @@ export default function CheckoutSuccessPage() {
             style={{ transitionDelay: '0.5s', opacity: show ? 1 : 0, transition: 'opacity 0.5s ease 0.5s' }}
           >
             <p className="text-sm text-gray-500">
-              {orderNumbers.length === 1 ? 'Orden' : 'Órdenes'} #
+              {orderNumbers.length === 1 ? 'Order' : 'Orders'} #
               {orderNumbers.join(', #')}
             </p>
           </div>
@@ -137,10 +137,10 @@ export default function CheckoutSuccessPage() {
           style={{ transitionDelay: '0.6s', opacity: show ? 1 : 0, transition: 'opacity 0.5s ease 0.6s' }}
         >
           <Link href="/orders" className="flex-1">
-            <Button className="w-full" size="lg">Ver mis órdenes</Button>
+            <Button className="w-full" size="lg">Track my orders</Button>
           </Link>
           <Link href="/marketplace" className="flex-1">
-            <Button variant="outline" className="w-full" size="lg">Seguir comprando</Button>
+            <Button variant="outline" className="w-full" size="lg">Keep browsing</Button>
           </Link>
         </div>
       </div>
