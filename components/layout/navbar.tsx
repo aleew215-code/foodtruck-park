@@ -58,7 +58,7 @@ export function Navbar() {
           {session ? (
             <>
               {/* Cart icon */}
-              {role === 'CUSTOMER' && (
+              {(!role || role === 'CUSTOMER') && (
                 <Link href="/cart" className="relative">
                   <Button
                     variant="ghost"
@@ -113,7 +113,7 @@ export function Navbar() {
                       </p>
                     </div>
 
-                    {role === 'CUSTOMER' && (
+                    {(!role || role === 'CUSTOMER') && (
                       <>
                         {[
                           { href: '/orders',  icon: ShoppingCart, label: 'My Orders' },

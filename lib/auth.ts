@@ -57,11 +57,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           token.tempPassword = (user as any).tempPassword
         } else {
           // Google OAuth — user object is the OAuth profile, not the DB row.
-          // Fetch role + tempPassword from the database using the user id.
-          const dbUser = await prisma.user.findUnique({
-            where: { id: user.id ?? token.sub! },
-            select: { role: true, tempPassword: true },
-          })
+          // Try by id first; fall back to email for first-time sign-ins where
+          // user.id and token.sub may still be undefined.
+          const userId = user.id ?? token.sub
+          const dbUser = userId
+            ? await prisma.user.findUnique({
+                where: { id: userId },
+                select: { role: true, tempPassword: true },
+              })
+            : user.email
+            ? await prisma.user.findUnique({
+                where: { email: user.email },
+                select: { role: true, tempPassword: true },
+              })
+            : null
           if (dbUser) {
             token.role = dbUser.role
             token.tempPassword = dbUser.tempPassword
