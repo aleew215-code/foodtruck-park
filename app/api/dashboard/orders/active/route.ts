@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
+import { authTruck } from '@/lib/auth-truck'
 import { prisma } from '@/lib/db'
 
 export async function GET(req: NextRequest) {
-  const session = await auth()
+  const session = await authTruck()
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const truckId = req.nextUrl.searchParams.get('truckId')
   const orders = await prisma.order.findMany({

@@ -1,17 +1,27 @@
 import { redirect } from 'next/navigation'
+import { authTruck } from '@/lib/auth-truck'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { DashboardNav } from '@/components/dashboard/DashboardNav'
 import { PushSetup } from '@/components/PushSetup'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth()
-  if (!session) redirect('/login')
-  const role = (session.user as any).role
-  if (role !== 'FOOD_TRUCK') redirect('/')
+  // Check for truck-specific session cookie (nap.truck)
+  const truckSession = await authTruck()
+
+  if (!truckSession) {
+    // No truck cookie yet — check if the user just logged in via the main login
+    // page (which sets the shared customer cookie).  If so, mint the truck cookie
+    // transparently and redirect back here.
+    const customerSession = await auth()
+    if (customerSession && (customerSession.user as any).role === 'FOOD_TRUCK') {
+      redirect('/api/auth-truck/transfer')
+    }
+    redirect('/login')
+  }
 
   const truck = await prisma.foodTruck.findUnique({
-    where: { userId: session.user.id },
+    where:  { userId: truckSession.user.id },
     select: { id: true, name: true, logo: true, isOpen: true },
   })
 

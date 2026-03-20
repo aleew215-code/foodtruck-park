@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
+import { authTruck } from '@/lib/auth-truck'
 import { prisma } from '@/lib/db'
 import { sendSMS, getPreparingMessage, getReadyMessage } from '@/lib/sms'
 import { sendPushNotification } from '@/lib/push'
@@ -14,7 +14,7 @@ const STATUS_PUSH: Record<string, { title: string; body: (orderNum: string, truc
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth()
+  const session = await authTruck()
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { id } = await params
   const { status } = await req.json()

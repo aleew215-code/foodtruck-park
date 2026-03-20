@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { signOut } from 'next-auth/react'
+// Sign-out is done via /api/auth-truck/signout which clears both the truck and customer cookies
 import {
   LayoutDashboard, ShoppingBag, UtensilsCrossed, Users,
   BarChart3, Settings, Truck, LogOut, Menu, X,
@@ -85,7 +85,7 @@ export function DashboardNav({ truckName, truckLogo }: DashboardNavProps) {
       {/* Sign out */}
       <div className="p-3 border-t border-gray-100">
         <button
-          onClick={() => signOut({ callbackUrl: '/login' })}
+          onClick={() => { window.location.href = '/api/auth-truck/signout' }}
           className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-500 transition"
           onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.06)')}
           onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
