@@ -1,4 +1,4 @@
-import { auth } from '@/lib/auth'
+import { authTruck } from '@/lib/auth-truck'
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import { DollarSign, ShoppingBag, Users, Star, TrendingUp, Clock } from 'lucide-react'
@@ -7,7 +7,7 @@ import { format, startOfDay, startOfWeek, startOfMonth } from 'date-fns'
 import { LiveOrderQueue } from '@/components/dashboard/LiveOrderQueue'
 
 export default async function DashboardOverview() {
-  const session = await auth()
+  const session = await authTruck()
   if (!session) redirect('/login')
 
   const truck = await prisma.foodTruck.findUnique({ where: { userId: session.user.id } })

@@ -1,4 +1,4 @@
-import { auth } from '@/lib/auth'
+import { authAdmin } from '@/lib/auth-admin'
 import { prisma } from '@/lib/db'
 import { formatCurrency } from '@/lib/utils'
 import { Users, Truck, ShoppingBag, DollarSign } from 'lucide-react'

@@ -5,7 +5,7 @@ import { useState } from 'react'
 // Sign-out is done via /api/auth-truck/signout which clears both the truck and customer cookies
 import {
   LayoutDashboard, ShoppingBag, UtensilsCrossed, Users,
-  BarChart3, Settings, Truck, LogOut, Menu, X,
+  BarChart3, Settings, Truck, LogOut, Menu, X, KeyRound,
 } from 'lucide-react'
 
 interface DashboardNavProps {
@@ -14,12 +14,13 @@ interface DashboardNavProps {
 }
 
 const NAV_ITEMS = [
-  { href: '/dashboard',            icon: LayoutDashboard, label: 'Overview'   },
-  { href: '/dashboard/orders',     icon: ShoppingBag,     label: 'Orders'     },
-  { href: '/dashboard/menu',       icon: UtensilsCrossed, label: 'Menu'       },
-  { href: '/dashboard/customers',  icon: Users,           label: 'Customers'  },
-  { href: '/dashboard/analytics',  icon: BarChart3,       label: 'Analytics'  },
-  { href: '/dashboard/settings',   icon: Settings,        label: 'Settings'   },
+  { href: '/dashboard',                   icon: LayoutDashboard, label: 'Overview'        },
+  { href: '/dashboard/orders',            icon: ShoppingBag,     label: 'Orders'          },
+  { href: '/dashboard/menu',              icon: UtensilsCrossed, label: 'Menu'            },
+  { href: '/dashboard/customers',         icon: Users,           label: 'Customers'       },
+  { href: '/dashboard/analytics',        icon: BarChart3,       label: 'Analytics'       },
+  { href: '/dashboard/settings',         icon: Settings,        label: 'Settings'        },
+  { href: '/dashboard/change-password',  icon: KeyRound,        label: 'Change Password' },
 ]
 
 export function DashboardNav({ truckName, truckLogo }: DashboardNavProps) {
