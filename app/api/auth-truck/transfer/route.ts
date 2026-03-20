@@ -22,6 +22,13 @@ export async function GET() {
   const role = (session.user as any).role
   if (role !== 'FOOD_TRUCK') redirect('/')
 
+  // NextAuth v5 uses AUTH_SECRET; older setups may use NEXTAUTH_SECRET
+  const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET
+  if (!secret) {
+    console.error('[transfer] AUTH_SECRET is not set – cannot mint truck JWT')
+    return NextResponse.json({ error: 'Server misconfiguration' }, { status: 500 })
+  }
+
   // Mint a truck-scoped JWT (salt must match the cookie name used by authTruck)
   const token = await encode({
     token: {
@@ -32,7 +39,7 @@ export async function GET() {
       role:         'FOOD_TRUCK',
       tempPassword: (session.user as any).tempPassword,
     },
-    secret:  process.env.AUTH_SECRET!,
+    secret,
     salt:    'nap.truck',
     maxAge:  30 * 24 * 60 * 60, // 30 days
   })
