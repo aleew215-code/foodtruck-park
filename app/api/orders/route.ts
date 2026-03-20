@@ -9,12 +9,35 @@ export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { foodTruckId, items, orderType, tableNumber, pickupTime, notes, paymentMethod, subtotal, tax } = await req.json()
+  const { foodTruckId, items, orderType, tableNumber, pickupTime, notes, paymentMethod } = await req.json()
 
   try {
-    const commission = subtotal * 0.024
-    const taxAmount = typeof tax === 'number' ? tax : subtotal * 0.07
+    // ── Server-side price verification ──────────────────────────────────
+    // Never trust client-supplied prices. Fetch authoritative prices from DB.
+    const menuItemIds = items.filter((i: any) => i.menuItemId).map((i: any) => i.menuItemId)
+    const dbItems = menuItemIds.length
+      ? await prisma.menuItem.findMany({ where: { id: { in: menuItemIds }, foodTruckId }, select: { id: true, name: true, price: true } })
+      : []
+    const priceMap = new Map(dbItems.map((i) => [i.id, i]))
+
+    const verifiedItems = items.map((i: any) => {
+      const dbItem = i.menuItemId ? priceMap.get(i.menuItemId) : null
+      const price = dbItem ? dbItem.price : (i.price ?? 0) // fallback for combos / custom items
+      return { menuItemId: i.menuItemId || null, comboId: i.comboId || null, name: dbItem?.name ?? i.name, price, quantity: i.quantity ?? 1, notes: i.notes || null }
+    })
+
+    const subtotal = verifiedItems.reduce((s: number, i: { price: number; quantity: number }) => s + i.price * i.quantity, 0)
+    const taxAmount = subtotal * 0.07
     const total = subtotal + taxAmount
+    const commission = subtotal * 0.024
+
+    // For wallet payments: ensure sufficient balance before creating the order
+    if (paymentMethod === 'WALLET') {
+      const userRecord = await prisma.user.findUnique({ where: { id: session.user.id }, select: { walletBalance: true } })
+      if (!userRecord || userRecord.walletBalance < total) {
+        return NextResponse.json({ error: 'Insufficient wallet balance' }, { status: 402 })
+      }
+    }
 
     const order = await prisma.order.create({
       data: {
@@ -31,7 +54,7 @@ export async function POST(req: NextRequest) {
         paymentMethod: paymentMethod === 'WALLET' ? 'WALLET' : 'CARD',
         paymentStatus: paymentMethod === 'WALLET' ? 'COMPLETED' : 'PENDING',
         status: paymentMethod === 'WALLET' ? 'CONFIRMED' : 'PENDING',
-        items: { create: items.map((i: any) => ({ menuItemId: i.menuItemId || null, comboId: i.comboId || null, name: i.name, price: i.price, quantity: i.quantity, notes: i.notes || null })) },
+        items: { create: verifiedItems },
       },
       include: { foodTruck: { include: { user: true } }, items: true },
     })

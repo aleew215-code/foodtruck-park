@@ -8,6 +8,15 @@ export async function POST(req: NextRequest) {
   const truck = await prisma.foodTruck.findUnique({ where: { userId: session.user.id } })
   if (!truck) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   const { name, description, price, categoryId, image, isAvailable, isPopular } = await req.json()
+
+  // Validate that the supplied categoryId actually belongs to this truck
+  if (categoryId) {
+    const cat = await prisma.menuCategory.findUnique({ where: { id: categoryId } })
+    if (!cat || cat.foodTruckId !== truck.id) {
+      return NextResponse.json({ error: 'Invalid category' }, { status: 400 })
+    }
+  }
+
   const item = await prisma.menuItem.create({ data: { foodTruckId: truck.id, name, description, price, categoryId: categoryId || null, image: image || null, isAvailable, isPopular } })
   return NextResponse.json(item)
 }

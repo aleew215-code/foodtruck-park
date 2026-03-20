@@ -19,6 +19,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const { id } = await params
   const { status } = await req.json()
 
+  // Verify the order belongs to the authenticated truck
+  const truck = await prisma.foodTruck.findUnique({ where: { userId: session.user.id } })
+  if (!truck) return NextResponse.json({ error: 'Truck not found' }, { status: 404 })
+
+  const existing = await prisma.order.findUnique({ where: { id } })
+  if (!existing || existing.foodTruckId !== truck.id) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
   const order = await prisma.order.update({
     where: { id },
     data: { status },

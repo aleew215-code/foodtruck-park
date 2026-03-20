@@ -1,8 +1,15 @@
-'use client'
-import { useEffect, useRef } from 'react'
+import { auth } from '@/lib/auth'
+import { redirect } from 'next/navigation'
 
-export default function AuthLayout({ children }: { children: React.ReactNode }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+export default async function AuthLayout({ children }: { children: React.ReactNode }) {
+  // Redirect already-authenticated users to the appropriate area
+  const session = await auth()
+  if (session) {
+    const role = (session.user as any).role
+    if (role === 'SUPER_ADMIN') redirect('/admin')
+    if (role === 'FOOD_TRUCK')  redirect('/dashboard')
+    redirect('/marketplace')
+  }
 
   return (
     <div

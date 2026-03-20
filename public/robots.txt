@@ -5,4 +5,3 @@ Disallow: /dashboard/
 Disallow: /admin/
 Disallow: /checkout/
 
-Sitemap: https://foodtruck-park.vercel.app/sitemap.xml
