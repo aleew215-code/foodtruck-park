@@ -14,6 +14,8 @@ const EXPIRED = { value: '', maxAge: 0, path: '/' }
 export async function GET() {
   const cookieStore = await cookies()
 
+  const isProd = process.env.NODE_ENV === 'production'
+
   const names = [
     'nap.truck',
     'nap.admin',
@@ -22,7 +24,15 @@ export async function GET() {
     '__Host-next-auth.session-token',
   ]
   for (const name of names) {
-    try { cookieStore.set(name, '', { maxAge: 0, path: '/' }) } catch {}
+    try {
+      cookieStore.set(name, '', {
+        maxAge: 0,
+        path: '/',
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: isProd,
+      })
+    } catch {}
   }
 
   redirect('/login')

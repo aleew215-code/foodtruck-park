@@ -10,9 +10,8 @@ import { PushSetup } from '@/components/PushSetup'
 export default async function CustomerLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
   if (!session) redirect('/login')
-  const role = (session.user as any).role
-  if (role === 'FOOD_TRUCK') redirect('/dashboard')
-  if (role === 'SUPER_ADMIN') redirect('/admin')
+  // NOTE: Do NOT redirect by role here. Sessions are independent:
+  // food truck owners and admins can also browse the marketplace.
 
   return (
     /* Deep dark warm background */

@@ -18,6 +18,8 @@ export async function GET() {
   // Force-expire every possible variant of each session cookie.
   // Using set(name, '', { maxAge: 0 }) is more reliable than delete()
   // in production because it matches the original Set-Cookie attributes.
+  const isProd = process.env.NODE_ENV === 'production'
+
   const names = [
     'nap.truck',
     'nap.admin',
@@ -26,7 +28,17 @@ export async function GET() {
     '__Host-next-auth.session-token',
   ]
   for (const name of names) {
-    try { cookieStore.set(name, '', { maxAge: 0, path: '/' }) } catch {}
+    // Set with the same security attributes used when the cookie was created
+    // so the browser recognises it as the same cookie and expires it.
+    try {
+      cookieStore.set(name, '', {
+        maxAge: 0,
+        path: '/',
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: isProd,
+      })
+    } catch {}
   }
 
   redirect('/login')

@@ -5,11 +5,13 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
   // Redirect already-authenticated users to the appropriate area
   const session = await auth()
   if (session) {
+    // Only redirect CUSTOMER / EMPLOYEE away from login.
+    // FOOD_TRUCK and SUPER_ADMIN users might visit /login to sign in
+    // as a different account, so don't auto-redirect them to the dashboard
+    // (that creates a loop when they're trying to log out).
     const role = (session.user as any).role
-    if (role === 'SUPER_ADMIN') redirect('/admin')
-    if (role === 'FOOD_TRUCK')  redirect('/dashboard')
-    if (role === 'EMPLOYEE')    redirect('/employee')
-    redirect('/marketplace')
+    if (role === 'EMPLOYEE') redirect('/employee')
+    if (role === 'CUSTOMER' || !role) redirect('/marketplace')
   }
 
   return (
