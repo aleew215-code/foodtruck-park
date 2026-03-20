@@ -86,6 +86,8 @@ export default function OrdersPage() {
     })
     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o))
     setUpdatingId(null)
+    // Always switch to ACTIVE so the order stays visible after status change
+    setFilter('ACTIVE')
   }
 
   const filtered     = orders.filter(o => filter === 'ACTIVE' ? ACTIVE_STATUSES.includes(o.status) : o.status === filter)
