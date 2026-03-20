@@ -28,19 +28,37 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
+  // Calculate ETA when confirming or beginning preparation
+  let estimatedReadyAt: Date | undefined
+  if (status === 'CONFIRMED' || status === 'PREPARING') {
+    const queueCount = await prisma.order.count({
+      where: { foodTruckId: truck.id, status: { in: ['CONFIRMED', 'PREPARING'] }, id: { not: id } },
+    })
+    const etaMinutes = (queueCount + 1) * (truck.avgPrepTime ?? 20)
+    estimatedReadyAt = new Date(Date.now() + etaMinutes * 60 * 1000)
+  }
+
   const order = await prisma.order.update({
     where: { id },
-    data: { status },
+    data: { status, ...(estimatedReadyAt ? { estimatedReadyAt } : {}) },
     include: { customer: true, foodTruck: true },
   })
 
   await prisma.orderStatusHistory.create({ data: { orderId: id, status } })
 
-  // SMS notifications
+  // SMS notifications (with ETA on CONFIRMED and PREPARING)
   try {
     if (order.customer.phone) {
-      if (status === 'PREPARING') {
-        const msg = getPreparingMessage(order.orderNumber, order.foodTruck.name, order.foodTruck.smsPrepMsg)
+      if (status === 'CONFIRMED' && estimatedReadyAt) {
+        const etaMin = Math.max(1, Math.round((estimatedReadyAt.getTime() - Date.now()) / 60000))
+        const msg = `Your order #${order.orderNumber} from ${order.foodTruck.name} is confirmed! Estimated wait: ~${etaMin} min based on current queue.`
+        await sendSMS(order.customer.phone, msg, order.foodTruck.smsFromNumber || undefined)
+      } else if (status === 'PREPARING') {
+        let msg = getPreparingMessage(order.orderNumber, order.foodTruck.name, order.foodTruck.smsPrepMsg)
+        if (estimatedReadyAt) {
+          const etaMin = Math.max(1, Math.round((estimatedReadyAt.getTime() - Date.now()) / 60000))
+          msg += ` Estimated ready in ~${etaMin} min.`
+        }
         await sendSMS(order.customer.phone, msg, order.foodTruck.smsFromNumber || undefined)
       } else if (status === 'READY' || status === 'ON_THE_WAY') {
         const msg = getReadyMessage(order.orderNumber, order.foodTruck.name, order.orderType, order.tableNumber, order.foodTruck.smsReadyMsg)

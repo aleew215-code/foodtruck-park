@@ -19,6 +19,7 @@ const NAV_ITEMS = [
   { href: '/dashboard/menu',              icon: UtensilsCrossed, label: 'Menu'            },
   { href: '/dashboard/customers',         icon: Users,           label: 'Customers'       },
   { href: '/dashboard/analytics',        icon: BarChart3,       label: 'Analytics'       },
+  { href: '/dashboard/employees',        icon: Users,           label: 'Team'            },
   { href: '/dashboard/settings',         icon: Settings,        label: 'Settings'        },
   { href: '/dashboard/change-password',  icon: KeyRound,        label: 'Change Password' },
 ]

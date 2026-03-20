@@ -44,6 +44,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           image: user.image,
           role: user.role,
           tempPassword: user.tempPassword,
+          employeeTruckId: user.employeeTruckId,
         }
       },
     }),
@@ -55,6 +56,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           // Credentials login — role comes directly from authorize()
           token.role = (user as any).role
           token.tempPassword = (user as any).tempPassword
+          token.employeeTruckId = (user as any).employeeTruckId ?? null
         } else {
           // Google OAuth — user object is the OAuth profile, not the DB row.
           // Try by id first; fall back to email for first-time sign-ins where
@@ -93,6 +95,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.image = (token.picture as string) ?? session.user.image
         ;(session.user as any).role          = token.role
         ;(session.user as any).tempPassword  = token.tempPassword
+        ;(session.user as any).employeeTruckId = token.employeeTruckId ?? null
       }
       return session
     },

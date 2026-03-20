@@ -10,6 +10,7 @@ datasource db {
 enum UserRole {
   CUSTOMER
   FOOD_TRUCK
+  EMPLOYEE
   SUPER_ADMIN
 }
 
@@ -66,6 +67,8 @@ model User {
   reviews            Review[]
   walletTransactions WalletTransaction[]
   foodTruck          FoodTruck?
+  employeeTruck   FoodTruck? @relation("TruckEmployees", fields: [employeeTruckId], references: [id])
+  employeeTruckId String?
 
   @@map("users")
 }
@@ -153,6 +156,7 @@ model FoodTruck {
   reviews        Review[]
   combos         Combo[]
   promotions     Promotion[]
+  employees      User[]         @relation("TruckEmployees")
 
   @@map("food_trucks")
 }

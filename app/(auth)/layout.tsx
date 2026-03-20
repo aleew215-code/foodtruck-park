@@ -8,6 +8,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
     const role = (session.user as any).role
     if (role === 'SUPER_ADMIN') redirect('/admin')
     if (role === 'FOOD_TRUCK')  redirect('/dashboard')
+    if (role === 'EMPLOYEE')    redirect('/employee')
     redirect('/marketplace')
   }
 
