@@ -14,9 +14,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const truck = await getTruck(session.user.id)
   if (!truck) return NextResponse.json({ error: 'Truck not found' }, { status: 404 })
 
-  // Verify item belongs to this truck (via its category)
-  const existing = await prisma.menuItem.findUnique({ where: { id }, include: { category: true } })
-  if (!existing || existing.category.foodTruckId !== truck.id) {
+  // Verify item belongs to this truck via foodTruckId (category may be null)
+  const existing = await prisma.menuItem.findUnique({ where: { id } })
+  if (!existing || existing.foodTruckId !== truck.id) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
@@ -33,9 +33,9 @@ export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id:
   const truck = await getTruck(session.user.id)
   if (!truck) return NextResponse.json({ error: 'Truck not found' }, { status: 404 })
 
-  // Verify item belongs to this truck (via its category)
-  const existing = await prisma.menuItem.findUnique({ where: { id }, include: { category: true } })
-  if (!existing || existing.category.foodTruckId !== truck.id) {
+  // Verify item belongs to this truck via foodTruckId (category may be null)
+  const existing = await prisma.menuItem.findUnique({ where: { id } })
+  if (!existing || existing.foodTruckId !== truck.id) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
