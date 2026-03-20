@@ -119,8 +119,8 @@ export default function OrdersPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black text-white">Orders</h1>
-          <p className="text-xs text-gray-500 mt-0.5">Auto-refresh every 6s · {format(lastRefresh, 'h:mm:ss a')}</p>
+          <h1 className="text-2xl font-black text-gray-900">Orders</h1>
+          <p className="text-xs text-gray-400 mt-0.5">Auto-refresh every 6s · {format(lastRefresh, 'h:mm:ss a')}</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={() => setSoundOn(s => !s)}
@@ -139,18 +139,18 @@ export default function OrdersPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Pending',          val: pendingCount,         icon: Clock,        color: '#eab308' },
-          { label: 'In Kitchen',       val: prepCount,            icon: ChefHat,      color: '#f97316' },
-          { label: 'Ready',            val: readyCount,           icon: CheckCircle2, color: '#22c55e' },
-          { label: "Today's Revenue",  val: formatCurrency(todayTotal), icon: Zap,   color: '#a78bfa' },
-        ].map(({ label, val, icon: Icon, color }) => (
+          { label: 'Pending',          val: pendingCount,               icon: Clock,        color: '#eab308', bg: '#fefce8', border: '#fde68a' },
+          { label: 'In Kitchen',       val: prepCount,                  icon: ChefHat,      color: '#ea6c00', bg: '#fff7ed', border: '#fed7aa' },
+          { label: 'Ready',            val: readyCount,                 icon: CheckCircle2, color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
+          { label: "Today's Revenue",  val: formatCurrency(todayTotal), icon: Zap,          color: '#7c3aed', bg: '#faf5ff', border: '#ddd6fe' },
+        ].map(({ label, val, icon: Icon, color, bg, border }) => (
           <div key={label} className="rounded-2xl p-4"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            style={{ background: bg, border: `1px solid ${border}` }}>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs text-gray-500">{label}</span>
+              <span className="text-xs font-medium" style={{ color: '#6b7280' }}>{label}</span>
               <Icon className="h-4 w-4" style={{ color }}/>
             </div>
-            <p className="text-2xl font-black text-white">{val}</p>
+            <p className="text-2xl font-black" style={{ color: '#111827' }}>{val}</p>
           </div>
         ))}
       </div>
@@ -161,9 +161,9 @@ export default function OrdersPage() {
           <button key={f} onClick={() => setFilter(f)}
             className="relative px-4 py-1.5 rounded-full text-sm font-bold transition"
             style={{
-              background: filter === f ? 'linear-gradient(135deg,#f97316,#ea6c00)' : 'rgba(255,255,255,0.06)',
-              color:      filter === f ? '#fff' : 'rgba(255,255,255,0.45)',
-              border:     filter === f ? 'none' : '1px solid rgba(255,255,255,0.08)',
+              background: filter === f ? 'linear-gradient(135deg,#f97316,#ea6c00)' : '#f3f4f6',
+              color:      filter === f ? '#fff' : '#6b7280',
+              border:     filter === f ? 'none' : '1px solid #e5e7eb',
             }}>
             {f}
             {f === 'PENDING' && pendingCount > 0 && (
@@ -179,9 +179,9 @@ export default function OrdersPage() {
       <div className="space-y-3">
         {filtered.length === 0 && (
           <div className="text-center py-16 rounded-2xl"
-            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <ShoppingBag className="h-10 w-10 text-gray-600 mx-auto mb-3"/>
-            <p className="text-gray-500 font-medium">No orders found</p>
+            style={{ background: '#f9fafb', border: '1px solid #f3f4f6' }}>
+            <ShoppingBag className="h-10 w-10 text-gray-300 mx-auto mb-3"/>
+            <p className="text-gray-400 font-medium">No orders found</p>
           </div>
         )}
 
@@ -206,7 +206,7 @@ export default function OrdersPage() {
                     order.status === 'READY'     ? 'bg-green-400' : 'bg-gray-600'}`}/>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-white font-black text-sm">#{order.orderNumber}</span>
+                      <span className="text-gray-900 font-black text-sm">#{order.orderNumber}</span>
                       <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${STATUS_COLORS[order.status] || ''}`}>
                         {order.status.replace('_',' ')}
                       </span>
@@ -224,7 +224,7 @@ export default function OrdersPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
-                  <span className="text-white font-black">{formatCurrency(order.total)}</span>
+                  <span className="text-gray-900 font-black">{formatCurrency(order.total)}</span>
                   {isExpanded ? <ChevronUp className="h-4 w-4 text-gray-500"/> : <ChevronDown className="h-4 w-4 text-gray-500"/>}
                 </div>
               </div>
@@ -248,7 +248,7 @@ export default function OrdersPage() {
                     ))}
                     <div className="pt-2 flex justify-between" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                       <span className="text-sm text-gray-500">Total</span>
-                      <span className="text-sm font-black text-white">{formatCurrency(order.total)}</span>
+                      <span className="text-sm font-black text-gray-900">{formatCurrency(order.total)}</span>
                     </div>
                   </div>
 
