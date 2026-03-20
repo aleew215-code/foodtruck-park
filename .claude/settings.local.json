@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "mcp__e8956366-c307-4548-8629-9e60e519f2c2__list_deployments"
     ]
   }
 }
