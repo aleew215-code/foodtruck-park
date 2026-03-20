@@ -9,15 +9,21 @@ import { redirect } from 'next/navigation'
 
 export const runtime = 'nodejs'
 
+const EXPIRED = { value: '', maxAge: 0, path: '/' }
+
 export async function GET() {
   const cookieStore = await cookies()
 
-  // Clear admin-specific cookie
-  cookieStore.delete('nap.admin')
-
-  // Clear customer session cookies (dev name + production __Secure- prefix)
-  cookieStore.delete('next-auth.session-token')
-  cookieStore.delete('__Secure-next-auth.session-token')
+  const names = [
+    'nap.truck',
+    'nap.admin',
+    'next-auth.session-token',
+    '__Secure-next-auth.session-token',
+    '__Host-next-auth.session-token',
+  ]
+  for (const name of names) {
+    try { cookieStore.set(name, '', { maxAge: 0, path: '/' }) } catch {}
+  }
 
   redirect('/login')
 }
