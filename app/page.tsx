@@ -10,7 +10,7 @@ export default async function HomePage({
   const session = await auth()
 
   if (!session) {
-    const redirectTo = params.table ? `/login?table=${params.table}` : '/login'
+    const redirectTo = params.table ? `/marketplace?table=${params.table}` : '/marketplace'
     redirect(redirectTo)
   }
 

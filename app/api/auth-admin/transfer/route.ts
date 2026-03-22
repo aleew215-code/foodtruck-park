@@ -5,6 +5,7 @@
  * with role SUPER_ADMIN but doesn't yet have an admin-specific session cookie
  * (nap.admin).  We mint a new admin JWT from the customer session data.
  */
+import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { encode } from 'next-auth/jwt'
 import { cookies } from 'next/headers'
@@ -20,6 +21,12 @@ export async function GET() {
   const role = (session.user as any).role
   if (role !== 'SUPER_ADMIN') redirect('/')
 
+  const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET
+  if (!secret) {
+    console.error('[transfer/admin] AUTH_SECRET is not set – cannot mint admin JWT')
+    return NextResponse.json({ error: 'Server misconfiguration' }, { status: 500 })
+  }
+
   // Mint an admin-scoped JWT (salt must match the cookie name used by authAdmin)
   const token = await encode({
     token: {
@@ -30,7 +37,7 @@ export async function GET() {
       role:         'SUPER_ADMIN',
       tempPassword: (session.user as any).tempPassword,
     },
-    secret:  process.env.AUTH_SECRET!,
+    secret,
     salt:    'nap.admin',
     maxAge:  30 * 24 * 60 * 60,
   })
