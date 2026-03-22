@@ -1,4 +1,3 @@
-import { redirect } from 'next/navigation'
 import { auth } from '@/lib/auth'
 import { Navbar } from '@/components/layout/navbar'
 import { BottomNav } from '@/components/layout/BottomNav'
@@ -9,9 +8,8 @@ import { PushSetup } from '@/components/PushSetup'
 
 export default async function CustomerLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
-  if (!session) redirect('/login')
-  // NOTE: Do NOT redirect by role here. Sessions are independent:
-  // food truck owners and admins can also browse the marketplace.
+  // Marketplace is public — no auth required to browse.
+  // Wallet / ordering features will prompt login when needed.
 
   return (
     /* Deep dark warm background */

@@ -11,6 +11,8 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
     // (that creates a loop when they're trying to log out).
     const role = (session.user as any).role
     if (role === 'EMPLOYEE') redirect('/employee')
+    if (role === 'FOOD_TRUCK') redirect('/dashboard')
+    if (role === 'SUPER_ADMIN') redirect('/admin')
     if (role === 'CUSTOMER' || !role) redirect('/marketplace')
   }
 

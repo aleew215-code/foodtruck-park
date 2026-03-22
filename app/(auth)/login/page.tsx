@@ -29,7 +29,14 @@ function LoginContent() {
       if (res?.error) {
         toast(res.error === 'Account deactivated' ? 'Your account has been deactivated.' : 'Invalid email or password.', 'error')
       } else {
-        router.push(table ? `/marketplace?table=${table}` : '/marketplace')
+        // Redirect by role
+        const resp = await fetch('/api/auth/session')
+        const session = await resp.json()
+        const role = session?.user?.role
+        if (role === 'FOOD_TRUCK') router.push('/dashboard')
+        else if (role === 'SUPER_ADMIN') router.push('/admin')
+        else if (role === 'EMPLOYEE') router.push('/employee')
+        else router.push(table ? `/marketplace?table=${table}` : '/marketplace')
         router.refresh()
       }
     } finally {
